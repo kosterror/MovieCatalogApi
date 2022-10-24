@@ -9,5 +9,5 @@ public class UserEntity
     public string Password { get; set; }
     public bool IsAdmin { get; set; }
     public Gender Gender { get; set; }
-    public IEnumerable<MovieEntity> FavoriteMovies { get; set; }
+    public List<MovieEntity> FavoriteMovies { get; set; } = new();
 }
