@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
-
-namespace MovieCatalogApi.Models.Entities;
+﻿namespace MovieCatalogApi.Models.Entities;
 
 public class MovieEntity
 {
