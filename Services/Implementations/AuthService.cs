@@ -78,7 +78,7 @@ public class AuthService : IAuthService
     }
 
     //TODO: поменять возвращаемый тип
-    public async Task<IActionResult> LogoutUser(string token)
+    public async Task LogoutUser(string token)
     {
         var tokenEntity = new TokenEntity
         {
@@ -87,8 +87,7 @@ public class AuthService : IAuthService
         };
 
         await _context.Tokens.AddAsync(tokenEntity);
-
-        return new OkResult();
+        await _context.SaveChangesAsync();
     }
     
     private async Task<ClaimsIdentity> GetIdentity(string userName, string password)

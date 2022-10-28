@@ -9,11 +9,13 @@ namespace MovieCatalogApi.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private IAuthService _service;
+    private IAuthService _authService;
+    private IValidateTokenService _validateTokenService;
 
-    public AuthController(IAuthService service)
+    public AuthController(IAuthService authService, IValidateTokenService validateTokenService)
     {
-        _service = service;
+        _authService = authService;
+        _validateTokenService = validateTokenService;
     }
 
 
@@ -21,23 +23,29 @@ public class AuthController : ControllerBase
     [Route("register")]
     public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
     {
-        return await _service.RegisterUser(userRegisterDto);
+        return await _authService.RegisterUser(userRegisterDto);
     }
 
-
-    // [HttpGet]
-    // [Authorize]
-    // [Route("test_login")]
-    // public IActionResult TestAuth()
-    // {
-    //     return Ok($"Ваш логин: {User.Identity.Name}");
-    // }
-
-    [HttpGet]
+    [HttpPost]
     [Authorize]
-    [Route("get-information")]
-    public IActionResult GetInfromationFromToken()
+    [Route("logout")]
+    public async Task<IActionResult> Logout()
     {
-        return Ok($"{User.Identity?.Name}");
+        //нельзя давать возможность два раза ралогиниться под одним и тем же токеном
+        if (await _validateTokenService.IsValidToken(HttpContext.Request.Headers))
+        {
+            var token = await _validateTokenService.GetToken(HttpContext.Request.Headers);
+            await _authService.LogoutUser(token);
+            return Ok();
+        }
+
+        return StatusCode(401);
+    }
+
+    [HttpPost]
+    [Route("login")]
+    public async Task<IActionResult> Login([FromBody] LoginCredentials loginCredentials)
+    {
+        return await _authService.LoginUser(loginCredentials);
     }
 }
