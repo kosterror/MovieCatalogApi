@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using MovieCatalogApi.Exceptions;
+﻿using MovieCatalogApi.Exceptions;
 
 namespace MovieCatalogApi.Middwares;
 
@@ -26,18 +25,12 @@ public class ExceptionMiddleware
         {
             await _next(context);
         }
-        catch (UserNotFoundException exception)
+        catch (NotFoundException exception)
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
-        catch (MovieNotFoundException exception)
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
-            
-        }
-        catch (ValidationException exception)
+        catch (WrongLoginCredentials exception)
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });

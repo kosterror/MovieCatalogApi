@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
+using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Models.Entities;
@@ -95,7 +95,7 @@ public class AuthService : IAuthService
 
         if (userEntity == null)
         {
-            throw new ValidationException("Wrong username or password");
+            throw new WrongLoginCredentials("Login failed");
         }
 
         var claims = new List<Claim>

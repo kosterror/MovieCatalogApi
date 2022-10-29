@@ -46,10 +46,10 @@ public class ReviewService : IReviewService
             await _context.SaveChangesAsync();
         } else if (userEntity == null)
         {
-            throw new UserNotFoundException("Пользователь не найден");
+            throw new NotFoundException("User not found");
         } else if (movieEntity == null)
         {
-            throw new MovieNotFoundException("Фильм не найден");
+            throw new NotFoundException("Movie not found");
         }
     }
 }
