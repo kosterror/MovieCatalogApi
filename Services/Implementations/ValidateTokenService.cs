@@ -33,11 +33,16 @@ public class ValidateTokenService : IValidateTokenService
         }
 
         var authorizationString = requestHeaders["Authorization"];
-        
+
         const string pattern = @"\S+\.\S+\.\S+";
         var regex = new Regex(pattern);
         var matches = regex.Matches(authorizationString);
-        
+
+        if (matches.Count <= 0)
+        {
+            throw new Exception();
+        }
+
         return matches.Count > 0 ? matches[0].Value : "";
     }
 }

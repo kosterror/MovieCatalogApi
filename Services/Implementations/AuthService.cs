@@ -53,8 +53,6 @@ public class AuthService : IAuthService
     public async Task<IActionResult> LoginUser(LoginCredentials loginCredentials)
     {
         var identity = await GetIdentity(loginCredentials.username, loginCredentials.password);
-
-        var nowTime = DateTime.UtcNow;
         
         var now = DateTime.UtcNow;
         

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
+using MovieCatalogApi.Middwares;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Services;
 using MovieCatalogApi.Services.Implementations;
@@ -17,6 +18,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IValidateTokenService, ValidateTokenService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -50,7 +52,9 @@ var app = builder.Build();
 //BD init and update
 using var serviceScope = app.Services.CreateScope();
 var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
-dbContext?.Database.Migrate();
+// dbContext?.Database.Migrate();
+
+app.UseExceptionHandlingMiddlwares();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
