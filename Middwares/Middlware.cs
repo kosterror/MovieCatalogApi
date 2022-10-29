@@ -30,9 +30,14 @@ public class ExceptionMiddleware
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
-        catch (WrongLoginCredentials exception)
+        catch (WrongLoginCredentialsException exception)
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
+        }
+        catch (ReviewAlreadyExistsException exception)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
     }

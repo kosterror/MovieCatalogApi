@@ -95,7 +95,7 @@ public class AuthService : IAuthService
 
         if (userEntity == null)
         {
-            throw new WrongLoginCredentials("Login failed");
+            throw new WrongLoginCredentialsException("Login failed");
         }
 
         var claims = new List<Claim>
