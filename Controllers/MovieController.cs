@@ -21,4 +21,11 @@ public class MovieController : ControllerBase
     {
         return _movieService.GetPage(page);
     }
+
+    [HttpGet]
+    [Route("details/{id}")]
+    public MovieDetailsDto GetMovieDetails(Guid id)
+    {
+        return _movieService.GetMovieDetails(id);
+    }
 }

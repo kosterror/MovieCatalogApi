@@ -50,6 +50,37 @@ public class MovieService : IMovieService
         return result;
     }
 
+    public MovieDetailsDto GetMovieDetails(Guid id)
+    {
+        var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == id);
+
+        if (movieEntity == null)
+        {
+            throw new NotFoundException("Movie with this ID does not exists");
+        }
+        
+        
+        var movieDetailsDto = new MovieDetailsDto
+        {
+            id = movieEntity.Id,
+            name = movieEntity.Name,
+            poster = movieEntity.Poster,
+            year = movieEntity.Year,
+            country = movieEntity.Country,
+            time = movieEntity.Time,
+            tagline = movieEntity.Tagline,
+            description = movieEntity.Description,
+            director = movieEntity.Director,
+            budget = movieEntity.Budget,
+            fees = movieEntity.Fees,
+            ageLimit = movieEntity.AgeLimit,
+            genres = GetGenreDtos(movieEntity),
+            reviews = GetReviewDtos(movieEntity)
+        };
+
+        return movieDetailsDto;
+    }
+
     private MovieElementDto GetMovieElementDto(MovieEntity movieEntity)
     {
         var movieElementDto = new MovieElementDto
@@ -96,5 +127,37 @@ public class MovieService : IMovieService
                 .ToList();
 
         return reviewShortDtos;
+    }
+
+    private List<ReviewDto> GetReviewDtos(MovieEntity movieEntity)
+    {
+        var reviewEntities = _context.Reviews.Where(x => x.Movie.Id == movieEntity.Id).ToList();
+
+        var reviewDtos =
+            reviewEntities
+                .Select(entity => new ReviewDto
+                {
+                    id = entity.Id,
+                    rating = entity.Rating,
+                    reviewText = entity.ReviewText,
+                    isAnonymous = entity.IsAnonymous,
+                    createDateTime = entity.CreatedDateTime,
+                    author = GetUserShortDto(entity)
+                })
+                .ToList();
+
+        return reviewDtos;
+    }
+
+    private UserShortDto GetUserShortDto(ReviewEntity reviewEntity)
+    {
+        var userShortDto = new UserShortDto
+        {
+            userId = reviewEntity.User.Id,
+            nickName = reviewEntity.User.UserName,
+            avatar = reviewEntity.User.Avatar
+        };
+
+        return userShortDto;
     }
 }

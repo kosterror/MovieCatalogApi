@@ -5,4 +5,5 @@ namespace MovieCatalogApi.Services;
 public interface IMovieService
 {
     MoviesPagedListDto GetPage(int page);
+    MovieDetailsDto GetMovieDetails(Guid id);
 }
