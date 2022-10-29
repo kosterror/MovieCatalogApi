@@ -45,6 +45,11 @@ public class ExceptionMiddleware
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
+        catch (BadRequestException exception)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
+        }
         catch (Exception exception)
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
