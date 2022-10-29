@@ -4,6 +4,7 @@ public class MovieEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string Poster { get; set; }
     public string Description { get; set; }
     public int Year { get; set; }
     public string Country { get; set; }
@@ -13,6 +14,6 @@ public class MovieEntity
     public int Budget { get; set; }
     public int Fees { get; set; }
     public int AgeLimit { get; set; }
-    public GenreEntity Genre { get; set; }
+    public List<GenreEntity> Genres { get; set; }
     public List<UserEntity> LikedUsers { get; set; } = new();
 }

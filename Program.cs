@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IValidateTokenService, ValidateTokenService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -52,7 +53,7 @@ var app = builder.Build();
 //BD init and update
 using var serviceScope = app.Services.CreateScope();
 var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
-// dbContext?.Database.Migrate();
+dbContext?.Database.Migrate();
 
 app.UseExceptionHandlingMiddlwares();
 
