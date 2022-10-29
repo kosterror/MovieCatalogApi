@@ -21,18 +21,27 @@ public class ReviewController : ControllerBase
     [HttpPost]
     [Route("{movieId}/review/add")]
     [Authorize]
-    public async Task<IActionResult> AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
+    public IActionResult AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
     {
-        await _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
+        _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
         return Ok();
     }
 
     [HttpPut]
     [Route("{movieId}/review/{id}/edit")]
     [Authorize]
-    public async Task<IActionResult> EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
+    public IActionResult EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
     {
-        await _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
+        _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
+        return Ok();
+    }
+
+    [HttpDelete]
+    [Route("{movieId}/review/{id}/delete")]
+    [Authorize]
+    public IActionResult DeleteReview(Guid movieId, Guid id)
+    {
+        _reviewService.DeleteReview(movieId, id, User.Identity.Name);
         return Ok();
     }
 }
