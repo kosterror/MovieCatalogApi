@@ -1,4 +1,5 @@
-﻿using MovieCatalogApi.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Models.Entities;
@@ -18,7 +19,10 @@ public class MovieService : IMovieService
 
     public MoviesPagedListDto GetPage(int page)
     {
-        var movieEntities = _context.Movies.ToList();
+        var movieEntities = _context.Movies
+            .Include(movie => movie.Genres)
+            .Include(movie => movie.LikedUsers)
+            .ToList();
         
         var pageInfo = new PageInfoDto
         {
@@ -52,8 +56,13 @@ public class MovieService : IMovieService
 
     public MovieDetailsDto GetMovieDetails(Guid id)
     {
-        var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == id);
+        // var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == id);
 
+        var movieEntity = _context.Movies
+            .Include(movie => movie.Genres)
+            .Include(movie => movie.LikedUsers)
+            .FirstOrDefault(x => x.Id == id);
+        
         if (movieEntity == null)
         {
             throw new NotFoundException("Movie with this ID does not exists");
@@ -131,7 +140,10 @@ public class MovieService : IMovieService
 
     private List<ReviewDto> GetReviewDtos(MovieEntity movieEntity)
     {
-        var reviewEntities = _context.Reviews.Where(x => x.Movie.Id == movieEntity.Id).ToList();
+        var reviewEntities = _context.Reviews
+            .Where(x => x.Movie.Id == movieEntity.Id)
+            .Include(x => x.User)
+            .ToList();
 
         var reviewDtos =
             reviewEntities

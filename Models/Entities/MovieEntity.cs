@@ -15,5 +15,5 @@ public class MovieEntity
     public int Fees { get; set; }
     public int AgeLimit { get; set; }
     public List<GenreEntity> Genres { get; set; }
-    public List<UserEntity> LikedUsers { get; set; } = new();
+    public List<UserEntity> LikedUsers { get; set; }
 }
