@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Services;
 
@@ -21,31 +22,30 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
+    public JsonResult RegisterUser([FromBody] UserRegisterDto userRegisterDto)
     {
-        return await _authService.RegisterUser(userRegisterDto);
+        return _authService.RegisterUser(userRegisterDto);
     }
 
     [HttpPost]
     [Authorize]
     [Route("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<JsonResult> Logout()
     {
         //нельзя давать возможность два раза ралогиниться под одним и тем же токеном
-        if (await _validateTokenService.IsValidToken(HttpContext.Request.Headers))
+        if (!await _validateTokenService.IsValidToken(HttpContext.Request.Headers))
         {
-            var token = await _validateTokenService.GetToken(HttpContext.Request.Headers);
-            await _authService.LogoutUser(token);
-            return Ok();
+            throw new PermissionDeniedException("Token is expired");
         }
-
-        return StatusCode(401);
+        
+        var token = await _validateTokenService.GetToken(HttpContext.Request.Headers);
+        return _authService.LogoutUser(token);
     }
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login([FromBody] LoginCredentials loginCredentials)
+    public JsonResult Login([FromBody] LoginCredentials loginCredentials)
     {
-        return await _authService.LoginUser(loginCredentials);
+        return _authService.LoginUser(loginCredentials);
     }
 }

@@ -5,7 +5,7 @@ namespace MovieCatalogApi.Services;
 
 public interface IAuthService
 {
-    public Task<IActionResult> RegisterUser(UserRegisterDto userRegisterDto);
-    public Task<IActionResult> LoginUser(LoginCredentials loginCredentials);
-    public Task LogoutUser(string token);
+    public JsonResult RegisterUser(UserRegisterDto userRegisterDto);
+    public JsonResult LoginUser(LoginCredentials loginCredentials);
+    public JsonResult LogoutUser(string token);
 }
