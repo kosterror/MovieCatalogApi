@@ -24,7 +24,7 @@ public class AuthService : IAuthService
     public JsonResult RegisterUser(UserRegisterDto userRegisterDto)
     {
         //TODO: добавить валидацию
-
+        
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
