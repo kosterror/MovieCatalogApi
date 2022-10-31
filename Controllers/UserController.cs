@@ -10,10 +10,12 @@ namespace MovieCatalogApi.Controllers;
 public class UserController : Controller
 {
     private IUserService _userService;
+    private IValidateTokenService _validateTokenService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IValidateTokenService validateTokenService)
     {
         _userService = userService;
+        _validateTokenService = validateTokenService;
     }
 
     [HttpGet]
@@ -21,7 +23,7 @@ public class UserController : Controller
     [Authorize]
     public ProfileDto GetProfile()
     {
-        //TODO проверить валидность токена
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return _userService.GetProfile(User.Identity.Name);
     }
 
@@ -30,7 +32,7 @@ public class UserController : Controller
     [Authorize]
     public void UpdateProfile([FromBody] ProfileDto profileDto)
     {
-        //TODO проверить валидность токена
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _userService.UpdateProfile(profileDto, User.Identity.Name);
     }
 }

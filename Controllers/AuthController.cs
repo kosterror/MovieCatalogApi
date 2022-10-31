@@ -31,9 +31,7 @@ public class AuthController : ControllerBase
     [Route("logout")]
     public JsonResult Logout()
     {
-        //нельзя давать возможность разлогиниваться под одним токеном несколько раз
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
         return _authService.LogoutUser(HttpContext.Request.Headers);
     }
 

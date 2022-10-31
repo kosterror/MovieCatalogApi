@@ -23,6 +23,7 @@ public class ReviewController : ControllerBase
     [Authorize]
     public IActionResult AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
     {
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
         return Ok();
     }
@@ -32,6 +33,7 @@ public class ReviewController : ControllerBase
     [Authorize]
     public IActionResult EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
     {
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
         return Ok();
     }
@@ -41,6 +43,7 @@ public class ReviewController : ControllerBase
     [Authorize]
     public IActionResult DeleteReview(Guid movieId, Guid id)
     {
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.DeleteReview(movieId, id, User.Identity.Name);
         return Ok();
     }

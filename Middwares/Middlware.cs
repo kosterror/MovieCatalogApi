@@ -1,4 +1,5 @@
-﻿using MovieCatalogApi.Exceptions;
+﻿using MovieCatalogApi.Controllers;
+using MovieCatalogApi.Exceptions;
 
 namespace MovieCatalogApi.Middwares;
 

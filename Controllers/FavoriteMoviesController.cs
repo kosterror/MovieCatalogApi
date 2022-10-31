@@ -10,17 +10,19 @@ namespace MovieCatalogApi.Controllers;
 public class FavoriteMoviesController : ControllerBase
 {
     private IFavoriteMoviesService _favoriteMoviesService;
+    private IValidateTokenService _validateTokenService;
 
-    public FavoriteMoviesController(IFavoriteMoviesService favoriteMoviesService)
+    public FavoriteMoviesController(IFavoriteMoviesService favoriteMoviesService, IValidateTokenService validateTokenService)
     {
         _favoriteMoviesService = favoriteMoviesService;
+        _validateTokenService = validateTokenService;
     }
-
+    
     [HttpGet]
     [Authorize]
     public MoviesListDto GetFavoriteMovies()
     {
-        //TODO добавить валидацию токена
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return _favoriteMoviesService.GetFavorites(User.Identity.Name);
     }
 
@@ -29,7 +31,7 @@ public class FavoriteMoviesController : ControllerBase
     [Authorize]
     public void AddFavourite(Guid id)
     {
-        //TODO добавить валидацию токена
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _favoriteMoviesService.AddFavourite(User.Identity.Name, id);
     }
 
@@ -38,7 +40,7 @@ public class FavoriteMoviesController : ControllerBase
     [Authorize]
     public void DeleteFavouriute(Guid id)
     {
-        //TODO доабвить валидацию токена
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _favoriteMoviesService.DeleteFavourite(User.Identity.Name, id);
     }
 }

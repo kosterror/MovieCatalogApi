@@ -8,7 +8,7 @@ namespace MovieCatalogApi.Controllers;
 [Route("api/movies")]
 public class MovieController : ControllerBase
 {
-    private IMovieService _movieService;
+    private readonly IMovieService _movieService;
 
     public MovieController(IMovieService movieService)
     {
