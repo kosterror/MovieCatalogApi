@@ -20,7 +20,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IValidateTokenService, ValidateTokenService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
