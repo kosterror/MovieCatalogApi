@@ -50,6 +50,11 @@ public class ExceptionMiddleware
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
+        catch (UserAlreadyExistsException exception)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
+        }
         catch (CanNotGetTokenException exception)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
