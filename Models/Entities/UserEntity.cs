@@ -14,7 +14,7 @@ public class UserEntity
     public DateTime BirthDate { get; set; }
     [Required]
     [MinLength(6)]
-    [MaxLength(16)]
+    [MaxLength(32)]
     [RegularExpression(@"[a-zA-Z]+\w*@[a-zA-Z]+\.[a-zA-Z]+")]
     public string Email { get; set; }
     [Required]
