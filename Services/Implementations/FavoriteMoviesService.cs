@@ -49,6 +49,29 @@ public class FavoriteMoviesService : IFavoriteMoviesService
 
     public void DeleteFavourite(string userName, Guid movieId)
     {
-        throw new NotImplementedException();
+        var userEntity = _context.Users
+            .Include(x => x.FavoriteMovies)
+            .FirstOrDefault(x => x.UserName == userName);
+        
+        var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == movieId);
+        
+        if (userEntity == null)
+        {
+            throw new PermissionDeniedException("User with this token was not found");
+        }
+
+        if (movieEntity == null)
+        {
+            throw new NotFoundException("Film with this ID was not found");
+        }
+
+        if (!userEntity.FavoriteMovies.Exists(x => x.Id == movieId))
+        {
+            throw new BadRequestException("Not-existing user favorite movie");
+        }
+
+        var index = userEntity.FavoriteMovies.FindIndex(x => x.Id == movieId);
+        userEntity.FavoriteMovies.RemoveAt(index);
+        _context.SaveChanges();
     }
 }

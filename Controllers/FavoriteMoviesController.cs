@@ -33,7 +33,7 @@ public class FavoriteMoviesController : ControllerBase
         _favoriteMoviesService.AddFavourite(User.Identity.Name, id);
     }
 
-    [HttpPost]
+    [HttpDelete]
     [Route("{id}/delete")]
     [Authorize]
     public void DeleteFavouriute(Guid id)
