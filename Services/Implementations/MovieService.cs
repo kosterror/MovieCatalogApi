@@ -56,8 +56,6 @@ public class MovieService : IMovieService
 
     public MovieDetailsDto GetMovieDetails(Guid id)
     {
-        // var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == id);
-
         var movieEntity = _context.Movies
             .Include(movie => movie.Genres)
             .Include(movie => movie.LikedUsers)
@@ -67,8 +65,7 @@ public class MovieService : IMovieService
         {
             throw new NotFoundException("Movie with this ID does not exists");
         }
-        
-        
+
         var movieDetailsDto = new MovieDetailsDto
         {
             id = movieEntity.Id,

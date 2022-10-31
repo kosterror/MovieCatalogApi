@@ -18,11 +18,19 @@ public class UserService : IUserService
     {
         var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName);
         
-        //вероятность попасть сюда почти нулевая, ну мне так кажется
-        //т.к. аннотация [Authorize] не пустит невалидный токен,
-        //а userName оттуда и достается
+        /*
+         * вероятность попасть сюда почти нулевая, ну мне так кажется 
+         * т.к. аннотация [Authorize] не пустит невалидный токен,
+         * а userName оттуда и достается
+        */
+
         if (userEntity == null)
         {
+            /*
+             * будто бы если мы сюда попали, то беда с токеном, значит
+             * нужно заставить послать нам другой, валидный токен
+             * а для этого нужно заставить получить новый токе, поэтому ошибка с 401 кодом 
+             */
             throw new PermissionDeniedException("User with this token not found");
         }
         
