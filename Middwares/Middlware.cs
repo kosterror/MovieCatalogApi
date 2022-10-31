@@ -1,4 +1,5 @@
-﻿using MovieCatalogApi.Exceptions;
+﻿using MovieCatalogApi.Controllers;
+using MovieCatalogApi.Exceptions;
 
 namespace MovieCatalogApi.Middwares;
 
@@ -48,6 +49,11 @@ public class ExceptionMiddleware
         catch (BadRequestException exception)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
+        }
+        catch (UserAlreadyExistsException exception)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (Exception exception)

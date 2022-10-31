@@ -1,4 +1,5 @@
-﻿using MovieCatalogApi.Exceptions;
+﻿using MovieCatalogApi.Controllers;
+using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 
@@ -13,13 +14,16 @@ public class UserService : IUserService
         _context = context;
     }
 
-    public ProfileDto GetUserProfile(string userName)
+    public ProfileDto GetProfile(string userName)
     {
         var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName);
-
+        
+        //вероятность попасть сюда почти нулевая, ну мне так кажется
+        //т.к. аннотация [Authorize] не пустит невалидный токен,
+        //а userName оттуда и достается
         if (userEntity == null)
         {
-            throw new BadRequestException("User with this UserName not found");
+            throw new PermissionDeniedException("User with this token not found");
         }
         
         var userProfile = new ProfileDto
@@ -34,5 +38,38 @@ public class UserService : IUserService
         };
 
         return userProfile;
+    }
+
+    public void UpdateProfile(ProfileDto profileDto, string userName)
+    {
+        /*
+         * Передаем логин, т.к. фронт может подсунуть нам не тот userId, так мы избегаем лишнюю валидацию
+         * вообще по-хорошему отдельную dto создать с полями, которые мы изменяем, а не со всем подряд
+         */
+
+        var userEntityWithSameEmail = _context.Users.FirstOrDefault(x => x.Email == profileDto.email);
+        
+        if (userEntityWithSameEmail != null && userEntityWithSameEmail.UserName != userName)
+        {
+            throw new UserAlreadyExistsException("User with such email has already exist");
+        }
+
+        var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName);
+        
+        //вероятность попасть сюда почти нулевая, ну мне так кажется
+        //т.к. аннотация [Authorize] не должна пустить невалидный токен
+        if (userEntity == null)
+        {
+            throw new PermissionDeniedException("User with this token not found");
+        }
+
+        //с остальными полями не работаю, т.к. они не могут на фронте изменяться
+        userEntity.Email = profileDto.email;
+        userEntity.Avatar = profileDto.avatarLink;
+        userEntity.Name = profileDto.name;
+        userEntity.BirthDate = profileDto.birthDate;
+        userEntity.Gender = profileDto.gender;
+        
+        _context.SaveChanges();
     }
 }

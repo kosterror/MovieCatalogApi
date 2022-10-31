@@ -22,6 +22,15 @@ public class UserController : Controller
     public ProfileDto GetProfile()
     {
         //TODO проверить валидность токена
-        return _userService.GetUserProfile(User.Identity.Name);
+        return _userService.GetProfile(User.Identity.Name);
+    }
+
+    [HttpPut]
+    [Route("profile")]
+    [Authorize]
+    public void UpdateProfile([FromBody] ProfileDto profileDto)
+    {
+        //TODO проверить валидность токена
+        _userService.UpdateProfile(profileDto, User.Identity.Name);
     }
 }
