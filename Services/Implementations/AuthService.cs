@@ -13,6 +13,7 @@ namespace MovieCatalogApi.Services.Implementations;
 public class AuthService : IAuthService
 {
     private ApplicationDbContext _context;
+    private ValidateTokenService _validateTokenService;
 
     public AuthService(ApplicationDbContext context)
     {
@@ -74,8 +75,10 @@ public class AuthService : IAuthService
         return new JsonResult(response);
     }
 
-    public JsonResult LogoutUser(string token)
+    public JsonResult LogoutUser(IHeaderDictionary headerDictionary)
     {
+        var token = _validateTokenService.GetToken(headerDictionary);
+        
         var tokenEntity = new TokenEntity
         {
             Id = Guid.NewGuid(),

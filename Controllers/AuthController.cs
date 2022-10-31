@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Services;
 
@@ -30,16 +29,12 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Authorize]
     [Route("logout")]
-    public async Task<JsonResult> Logout()
+    public JsonResult Logout()
     {
-        //нельзя давать возможность два раза ралогиниться под одним и тем же токеном
-        if (!await _validateTokenService.IsValidToken(HttpContext.Request.Headers))
-        {
-            throw new PermissionDeniedException("Token is expired");
-        }
-        
-        var token = await _validateTokenService.GetToken(HttpContext.Request.Headers);
-        return _authService.LogoutUser(token);
+        //нельзя давать возможность разлогиниваться под одним токеном несколько раз
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+
+        return _authService.LogoutUser(HttpContext.Request.Headers);
     }
 
     [HttpPost]
