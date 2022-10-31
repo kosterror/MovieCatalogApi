@@ -13,11 +13,12 @@ namespace MovieCatalogApi.Services.Implementations;
 public class AuthService : IAuthService
 {
     private ApplicationDbContext _context;
-    private ValidateTokenService _validateTokenService;
+    private IValidateTokenService _validateTokenService;
 
-    public AuthService(ApplicationDbContext context)
+    public AuthService(ApplicationDbContext context, IValidateTokenService validateTokenService)
     {
         _context = context;
+        _validateTokenService = validateTokenService;
     }
 
     public JsonResult RegisterUser(UserRegisterDto userRegisterDto)
