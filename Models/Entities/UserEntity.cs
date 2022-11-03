@@ -14,11 +14,10 @@ public class UserEntity
     public DateTime BirthDate { get; set; }
     [Required]
     [MinLength(6)]
-    [MaxLength(32)]
     [RegularExpression(@"[a-zA-Z]+\w*@[a-zA-Z]+\.[a-zA-Z]+")]
     public string Email { get; set; }
     [Required]
-    [MinLength(8)]
+    [MinLength(6)]
     public string Password { get; set; }
     [Required]
     public bool IsAdmin { get; set; }

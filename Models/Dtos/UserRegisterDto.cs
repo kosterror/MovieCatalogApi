@@ -12,12 +12,11 @@ public class UserRegisterDto
     public string name { get; set; }
     
     [Required]
-    [MinLength(8)]
+    [MinLength(6)]
     public string password { get; set; } 
     
     [Required]
     [MinLength(6)]
-    [MaxLength(32)]
     [RegularExpression(@"[a-zA-Z]+\w*@[a-zA-Z]+\.[a-zA-Z]+")]
     public string email { get; set; }
     

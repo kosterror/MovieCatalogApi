@@ -23,8 +23,11 @@ public class AuthService : IAuthService
 
     public JsonResult RegisterUser(UserRegisterDto userRegisterDto)
     {
-        //TODO: добавить валидацию
-        
+        userRegisterDto.email = NormalizeAyttribute(userRegisterDto.email);
+        userRegisterDto.userName = NormalizeAyttribute(userRegisterDto.userName);
+
+        CheckUniqueFields(userRegisterDto);
+
         var userEntity = new UserEntity
         {
             Id = Guid.NewGuid(),
@@ -52,6 +55,10 @@ public class AuthService : IAuthService
 
     public JsonResult LoginUser(LoginCredentials loginCredentials)
     {
+        //логин должен быть в одном регистре и без пробелов
+        //т.к. в бд мы его таким и храним
+        loginCredentials.username = NormalizeAyttribute(loginCredentials.username);
+
         var identity = GetIdentity(loginCredentials.username, loginCredentials.password);
 
         var now = DateTime.UtcNow;
@@ -76,10 +83,11 @@ public class AuthService : IAuthService
         return new JsonResult(response);
     }
 
+    //TODO поменять возвращаемый тип
     public JsonResult LogoutUser(IHeaderDictionary headerDictionary)
     {
         var token = _validateTokenService.GetToken(headerDictionary);
-        
+
         var tokenEntity = new TokenEntity
         {
             Id = Guid.NewGuid(),
@@ -100,8 +108,7 @@ public class AuthService : IAuthService
 
     private ClaimsIdentity GetIdentity(string userName, string password)
     {
-        var userEntity = _context.Users
-            .FirstOrDefault(x => x.UserName == userName && x.Password == password);
+        var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
 
         if (userEntity == null)
         {
@@ -118,5 +125,33 @@ public class AuthService : IAuthService
             ClaimsIdentity.DefaultRoleClaimType);
 
         return claimsIdentity;
+    }
+
+    private string NormalizeAyttribute(string attribute)
+    {
+        var result = attribute.ToLower();
+        result = result.Replace(" ", "");
+
+        return result;
+    }
+
+    private void CheckUniqueFields(UserRegisterDto userRegisterDto)
+    {
+        var checkUniqueEmail = _context.Users.FirstOrDefault(x => userRegisterDto.email == x.Email);
+
+        if (checkUniqueEmail != null)
+        {
+            //TODO поменять тип исключения
+            throw new Exception();
+        }
+
+
+        var checkUniqueUserName = _context.Users.FirstOrDefault(x => userRegisterDto.userName == x.UserName);
+
+        if (checkUniqueEmail != null)
+        {
+            //TODO поменять тип исключения
+            throw new Exception();
+        }
     }
 }
