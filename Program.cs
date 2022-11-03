@@ -9,6 +9,8 @@ using MovieCatalogApi.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -21,6 +23,8 @@ builder.Services.AddScoped<IValidateTokenService, ValidateTokenService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
+builder.Services.AddHostedService<TokenCleanerService>();
+
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -40,7 +44,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //DB connection
 var connectionPsql = builder.Configuration.GetConnectionString("Postgres");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionPsql));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionPsql), ServiceLifetime.Singleton);
 
 var app = builder.Build();
 
