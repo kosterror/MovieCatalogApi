@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
 using MovieCatalogApi.Exceptions;
@@ -21,7 +20,7 @@ public class AuthService : IAuthService
         _validateTokenService = validateTokenService;
     }
 
-    public JsonResult RegisterUser(UserRegisterDto userRegisterDto)
+    public TokenDto RegisterUser(UserRegisterDto userRegisterDto)
     {
         userRegisterDto.email = NormalizeAyttribute(userRegisterDto.email);
         userRegisterDto.userName = NormalizeAyttribute(userRegisterDto.userName);
@@ -53,7 +52,7 @@ public class AuthService : IAuthService
         return LoginUser(loginCredentials);
     }
 
-    public JsonResult LoginUser(LoginCredentials loginCredentials)
+    public TokenDto LoginUser(LoginCredentials loginCredentials)
     {
         //логин должен быть в одном регистре и без пробелов
         //т.к. в бд мы его таким и храним
@@ -75,12 +74,12 @@ public class AuthService : IAuthService
 
         var encodeJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-        var response = new
+        var result = new TokenDto()
         {
             token = encodeJwt
         };
 
-        return new JsonResult(response);
+        return result;
     }
 
     public LoggedOutDto LogoutUser(IHeaderDictionary headerDictionary)

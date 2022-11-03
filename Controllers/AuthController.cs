@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    public JsonResult RegisterUser([FromBody] UserRegisterDto userRegisterDto)
+    public TokenDto RegisterUser([FromBody] UserRegisterDto userRegisterDto)
     {
         return _authService.RegisterUser(userRegisterDto);
     }
@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public JsonResult Login([FromBody] LoginCredentials loginCredentials)
+    public TokenDto Login([FromBody] LoginCredentials loginCredentials)
     {
         return _authService.LoginUser(loginCredentials);
     }
