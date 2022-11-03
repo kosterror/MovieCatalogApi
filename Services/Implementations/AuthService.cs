@@ -83,8 +83,7 @@ public class AuthService : IAuthService
         return new JsonResult(response);
     }
 
-    //TODO поменять возвращаемый тип
-    public JsonResult LogoutUser(IHeaderDictionary headerDictionary)
+    public LoggedOutDto LogoutUser(IHeaderDictionary headerDictionary)
     {
         var token = _validateTokenService.GetToken(headerDictionary);
 
@@ -97,13 +96,13 @@ public class AuthService : IAuthService
         _context.Tokens.Add(tokenEntity);
         _context.SaveChanges();
 
-        var response = new
+        var result = new LoggedOutDto()
         {
             token = token,
             message = "Logged out"
         };
 
-        return new JsonResult(response);
+        return result;
     }
 
     private ClaimsIdentity GetIdentity(string userName, string password)

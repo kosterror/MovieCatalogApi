@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Authorize]
     [Route("logout")]
-    public JsonResult Logout()
+    public LoggedOutDto Logout()
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
         return _authService.LogoutUser(HttpContext.Request.Headers);

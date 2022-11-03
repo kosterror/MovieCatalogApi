@@ -7,5 +7,5 @@ public interface IAuthService
 {
     public JsonResult RegisterUser(UserRegisterDto userRegisterDto);
     public JsonResult LoginUser(LoginCredentials loginCredentials);
-    public JsonResult LogoutUser(IHeaderDictionary headerDictionary);
+    public LoggedOutDto LogoutUser(IHeaderDictionary headerDictionary);
 }
