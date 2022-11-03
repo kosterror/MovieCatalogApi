@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
     public LoggedOutDto Logout()
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
-        return _authService.LogoutUser(HttpContext.Request.Headers);
+        return _authService.LogoutUser(HttpContext);
     }
 
     [HttpPost]

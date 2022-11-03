@@ -42,7 +42,7 @@ public class AuthService : IAuthService
 
         _context.Users.Add(userEntity);
         _context.SaveChanges();
-
+        
         var loginCredentials = new LoginCredentials
         {
             password = userEntity.Password,
@@ -73,6 +73,7 @@ public class AuthService : IAuthService
 
 
         var encodeJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+        
 
         var result = new TokenDto()
         {
@@ -82,19 +83,24 @@ public class AuthService : IAuthService
         return result;
     }
 
-    public LoggedOutDto LogoutUser(IHeaderDictionary headerDictionary)
+    public LoggedOutDto LogoutUser(HttpContext httpContext)
     {
-        var token = _validateTokenService.GetToken(headerDictionary);
-
+        var token = _validateTokenService.GetToken(httpContext.Request.Headers);
+        
+        var handler = new JwtSecurityTokenHandler();
+        var expiredDate = handler.ReadJwtToken(token).ValidTo;
+        
         var tokenEntity = new TokenEntity
         {
             Id = Guid.NewGuid(),
-            Token = token
+            Token = token,
+            ExpiredDate = expiredDate
         };
-
+        
         _context.Tokens.Add(tokenEntity);
         _context.SaveChanges();
-
+        
+        
         var result = new LoggedOutDto()
         {
             token = token,

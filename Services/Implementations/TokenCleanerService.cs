@@ -1,5 +1,5 @@
-﻿using MovieCatalogApi.Models;
-using MovieCatalogApi.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using MovieCatalogApi.Models;
 
 namespace MovieCatalogApi.Services.Implementations;
 
@@ -17,16 +17,19 @@ public class TokenCleanerService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var tokenEntity = new TokenEntity()
-            {
-                Id = Guid.NewGuid(),
-                Token = DateTime.UtcNow.ToLongTimeString()
-            };
+            var currentDateTime = DateTime.UtcNow;
 
-            _context.Tokens.AddAsync(tokenEntity);
-            _context.SaveChangesAsync();
+            var expiredTokens = await _context.Tokens.Where(x => x.ExpiredDate <= currentDateTime).ToListAsync(cancellationToken: stoppingToken);
+
+            foreach (var expiredToken in expiredTokens)
+            {
+                _context.Tokens.Remove(expiredToken);
+                Console.WriteLine(expiredToken.ExpiredDate);
+            }
+
+            await _context.SaveChangesAsync(stoppingToken);
             
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-        }
+            await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
+       }
     }
 }
