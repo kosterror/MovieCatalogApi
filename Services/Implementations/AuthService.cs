@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
+using MovieCatalogApi.Controllers;
 using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
@@ -36,7 +37,7 @@ public class AuthService : IAuthService
             Email = userRegisterDto.email,
             BirthDate = userRegisterDto.birthDate,
             Gender = userRegisterDto.gender,
-            IsAdmin = false, //в спеке не нашел, где этот атрибут играл бы важную роль
+            IsAdmin = false,                        //в спеке не нашел, где этот атрибут играл бы важную роль
             Avatar = "none"
         };
 
@@ -54,8 +55,11 @@ public class AuthService : IAuthService
 
     public TokenDto LoginUser(LoginCredentials loginCredentials)
     {
-        //логин должен быть в одном регистре и без пробелов
-        //т.к. в бд мы его таким и храним
+        /*
+         * логин должен быть в нижнем регистре и без пробелов
+         * т.к. в бд мы его таким и храним
+         */
+
         loginCredentials.username = NormalizeAyttribute(loginCredentials.username);
 
         var identity = GetIdentity(loginCredentials.username, loginCredentials.password);
@@ -141,21 +145,19 @@ public class AuthService : IAuthService
 
     private void CheckUniqueFields(UserRegisterDto userRegisterDto)
     {
+        var checkUniqueUserName = _context.Users.FirstOrDefault(x => userRegisterDto.userName == x.UserName);
+
+        if (checkUniqueUserName != null)
+        {
+            throw new UserAlreadyExistsException($"UserName '{userRegisterDto.userName}' is already taken");
+        }
+        
+        
         var checkUniqueEmail = _context.Users.FirstOrDefault(x => userRegisterDto.email == x.Email);
 
         if (checkUniqueEmail != null)
         {
-            //TODO поменять тип исключения
-            throw new Exception();
-        }
-
-
-        var checkUniqueUserName = _context.Users.FirstOrDefault(x => userRegisterDto.userName == x.UserName);
-
-        if (checkUniqueEmail != null)
-        {
-            //TODO поменять тип исключения
-            throw new Exception();
+            throw new UserAlreadyExistsException($"Email '{userRegisterDto.email}' is already taken");
         }
     }
 }
