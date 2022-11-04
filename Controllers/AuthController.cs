@@ -9,15 +9,14 @@ namespace MovieCatalogApi.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private IAuthService _authService;
-    private IValidateTokenService _validateTokenService;
+    private readonly IAuthService _authService;
+    private readonly IValidateTokenService _validateTokenService;
 
     public AuthController(IAuthService authService, IValidateTokenService validateTokenService)
     {
         _authService = authService;
         _validateTokenService = validateTokenService;
     }
-
 
     [HttpPost]
     [Route("register")]
@@ -37,7 +36,7 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("login")]
-    public TokenDto Login([FromBody] LoginCredentials loginCredentials)
+    public async Task<TokenDto> Login([FromBody] LoginCredentials loginCredentials)
     {
         return _authService.LoginUser(loginCredentials);
     }

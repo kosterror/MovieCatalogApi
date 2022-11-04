@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MovieCatalogApi.Configurations;
 using MovieCatalogApi.Conmfigurations;
-using MovieCatalogApi.Middwares;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Services;
 using MovieCatalogApi.Services.Implementations;
@@ -23,6 +23,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
+builder.Services.AddScoped<ILoggerService, LoggerService>();
 
 
 builder.Services.AddAuthorization();

@@ -1,21 +1,13 @@
 ﻿using MovieCatalogApi.Controllers;
 using MovieCatalogApi.Exceptions;
 
-namespace MovieCatalogApi.Middwares;
+namespace MovieCatalogApi.Services.Implementations;
 
-public static class MiddlewareExtensions
-{
-    public static void UseExceptionHandlingMiddlwares(this WebApplication app)
-    {
-        app.UseMiddleware<ExceptionMiddleware>();
-    }
-}
-
-public class ExceptionMiddleware
+public class ExceptionMiddlewareService
 {
     private readonly RequestDelegate _next;
 
-    public ExceptionMiddleware(RequestDelegate next)
+    public ExceptionMiddlewareService(RequestDelegate next)
     {
         _next = next;
     }
