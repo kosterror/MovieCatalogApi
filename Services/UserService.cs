@@ -3,11 +3,11 @@ using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 
-namespace MovieCatalogApi.Services.Implementations;
+namespace MovieCatalogApi.Services;
 
 public class UserService : IUserService
 {
-    private ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
 
     public UserService(ApplicationDbContext context)
     {

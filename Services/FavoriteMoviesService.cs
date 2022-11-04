@@ -4,7 +4,7 @@ using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Models.Entities;
 
-namespace MovieCatalogApi.Services.Implementations;
+namespace MovieCatalogApi.Services;
 
 public class FavoriteMoviesService : IFavoriteMoviesService
 {

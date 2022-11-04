@@ -2,7 +2,7 @@
 using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 
-namespace MovieCatalogApi.Services.Implementations;
+namespace MovieCatalogApi.Services;
 
 public class ValidateTokenService : IValidateTokenService
 {

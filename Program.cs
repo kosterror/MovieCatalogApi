@@ -5,7 +5,6 @@ using MovieCatalogApi.Configurations;
 using MovieCatalogApi.Conmfigurations;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Services;
-using MovieCatalogApi.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 

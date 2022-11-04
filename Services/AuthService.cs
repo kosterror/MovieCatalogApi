@@ -8,12 +8,12 @@ using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Models.Entities;
 
-namespace MovieCatalogApi.Services.Implementations;
+namespace MovieCatalogApi.Services;
 
 public class AuthService : IAuthService
 {
-    private ApplicationDbContext _context;
-    private IValidateTokenService _validateTokenService;
+    private readonly ApplicationDbContext _context;
+    private readonly IValidateTokenService _validateTokenService;
 
     public AuthService(ApplicationDbContext context, IValidateTokenService validateTokenService)
     {

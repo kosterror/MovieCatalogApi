@@ -1,8 +1,8 @@
-﻿namespace MovieCatalogApi.Services.Implementations;
+﻿namespace MovieCatalogApi.Services;
 
 public class LoggerService : ILoggerService
 {
-    private const string fileDirectory = "./Logs/";
+    private const string FileDirectory = "./Logs/";
     
     public async Task LogInfo(string message)
     {
@@ -18,17 +18,15 @@ public class LoggerService : ILoggerService
         await Log(path, $"{DateTime.UtcNow.ToLongTimeString()} |ERR| {message}");
     }
 
-
-    //само логирование в файл
-    private async Task Log(string pathFile, string message)
+    
+    private static async Task Log(string pathFile, string message)
     {
         await using var writer = new StreamWriter(pathFile, true);
         await writer.WriteLineAsync(message);
         writer.Close();
     }
 
-    //создаем файл, если он не создан
-    private void CreateLogFile(string pathFile)
+    private static void CreateLogFile(string pathFile)
     {
         var fileInfo = new FileInfo(pathFile);
         
@@ -38,8 +36,8 @@ public class LoggerService : ILoggerService
         fileStream.Close();
     }
 
-    private string GetPathFile()
+    private static string GetPathFile()
     {
-        return $"{fileDirectory}{DateTime.UtcNow.ToShortDateString()}.txt";
+        return $"{FileDirectory}{DateTime.UtcNow.ToShortDateString()}.txt";
     }
 }
