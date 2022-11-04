@@ -13,7 +13,7 @@ public class MovieDetailsDto
     public string tagline { get; set; }
     public string description { get; set; }
     public string director { get; set; }
-    public int budget { get; set; }
-    public int fees { get; set; }
+    public int? budget { get; set; }
+    public int? fees { get; set; }
     public int ageLimit { get; set; }
 }

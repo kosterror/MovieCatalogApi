@@ -27,7 +27,7 @@ public class MovieService : IMovieService
         var pageInfo = new PageInfoDto
         {
             currentPage = page,
-            pageCount = (int)Math.Ceiling(movieEntities.Count / (double)page) == 0 ? 1 : (int)Math.Ceiling(movieEntities.Count / (double)page),
+            pageCount = (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize")) == 0 ? 1 : (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize")),
             pageSize = _configuration.GetValue<int>("PageSize")
         };
 
