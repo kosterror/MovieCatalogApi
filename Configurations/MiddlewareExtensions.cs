@@ -1,4 +1,4 @@
-﻿using MovieCatalogApi.Services.Implementations;
+﻿using MovieCatalogApi.Services;
 
 namespace MovieCatalogApi.Configurations;
 
