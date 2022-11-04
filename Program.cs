@@ -23,7 +23,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
-builder.Services.AddScoped<ILoggerService, LoggerService>();
+builder.Services.AddSingleton<ILoggerService, LoggerService>();
 
 
 builder.Services.AddAuthorization();

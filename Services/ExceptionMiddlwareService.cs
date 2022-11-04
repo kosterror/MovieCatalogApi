@@ -6,11 +6,14 @@ namespace MovieCatalogApi.Services.Implementations;
 public class ExceptionMiddlewareService
 {
     private readonly RequestDelegate _next;
+    private readonly ILoggerService _loggerService;
 
-    public ExceptionMiddlewareService(RequestDelegate next)
+    public ExceptionMiddlewareService(RequestDelegate next, ILoggerService loggerService)
     {
         _next = next;
+        _loggerService = loggerService;
     }
+
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -20,6 +23,7 @@ public class ExceptionMiddlewareService
         }
         catch (NotFoundException exception)
         {
+            
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
