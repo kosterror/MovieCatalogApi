@@ -21,10 +21,10 @@ public class UserController : Controller
     [HttpGet]
     [Route("profile")]
     [Authorize]                     
-    [Authorize(Policy = "test")]
+    [Authorize(Policy = "ValidateToken")]
     public ProfileDto GetProfile()
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        // _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return _userService.GetProfile(User.Identity.Name);
     }
 

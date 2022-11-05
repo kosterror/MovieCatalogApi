@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Configurations;
 using MovieCatalogApi.Conmfigurations;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Services;
+using MovieCatalogApi.Services.CustomAuth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,14 +25,14 @@ builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
+// builder.Services.AddSingleton<IAuthorizationHandler, CustomAuthRequirement>();
+builder.Services.AddSingleton<IAuthorizationHandler, UserNameRequirementHandler>();
 
 builder.Services.AddAuthorization(options =>
 {
-     options.AddPolicy(
-         "SomePolicyName", 
-         policy => policy
-             .Requirements
-             .Add(new CustomAuthRequirement(/**/)));
+    options.AddPolicy(
+        "ValidateToken",
+        policy => policy.Requirements.Add(new UserNameRequirement("admin")));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
