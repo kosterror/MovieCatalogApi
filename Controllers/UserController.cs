@@ -20,7 +20,8 @@ public class UserController : Controller
 
     [HttpGet]
     [Route("profile")]
-    [Authorize]
+    [Authorize]                     
+    [Authorize(Policy = "test")]
     public ProfileDto GetProfile()
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);

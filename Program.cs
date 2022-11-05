@@ -24,8 +24,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
 
+builder.Services.AddAuthorization(options =>
+{
+     options.AddPolicy(
+         "SomePolicyName", 
+         policy => policy
+             .Requirements
+             .Add(new CustomAuthRequirement(/**/)));
+});
 
-builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -51,6 +58,7 @@ var app = builder.Build();
 using var serviceScope = app.Services.CreateScope();
 var dbContext = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
 dbContext?.Database.Migrate();
+
 
 app.UseExceptionHandlingMiddlwares();
 
