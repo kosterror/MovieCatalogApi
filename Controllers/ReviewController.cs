@@ -9,8 +9,8 @@ namespace MovieCatalogApi.Controllers;
 [ApiController]
 public class ReviewController : ControllerBase
 {
-    private IReviewService _reviewService;
-    private IValidateTokenService _validateTokenService;
+    private readonly IReviewService _reviewService;
+    private readonly IValidateTokenService _validateTokenService;
     
     public ReviewController(IReviewService reviewService, IValidateTokenService validateTokenService)
     {
@@ -21,30 +21,27 @@ public class ReviewController : ControllerBase
     [HttpPost]
     [Route("{movieId}/review/add")]
     [Authorize]
-    public IActionResult AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
+    public void AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
-        return Ok();
     }
 
     [HttpPut]
     [Route("{movieId}/review/{id}/edit")]
     [Authorize]
-    public IActionResult EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
+    public void EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
-        return Ok();
     }
 
     [HttpDelete]
     [Route("{movieId}/review/{id}/delete")]
     [Authorize]
-    public IActionResult DeleteReview(Guid movieId, Guid id)
+    public void DeleteReview(Guid movieId, Guid id)
     {
         _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         _reviewService.DeleteReview(movieId, id, User.Identity.Name);
-        return Ok();
     }
 }

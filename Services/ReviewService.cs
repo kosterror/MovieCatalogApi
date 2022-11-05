@@ -14,31 +14,44 @@ public class ReviewService : IReviewService
         _context = context;
     }
 
-    public void AddReview(ReviewModifyDto reviewModifyDto, Guid movieId, string userName)
-    {
-        var userEntity = _context.Users
-            .FirstOrDefault(x => x.UserName == userName);
+    /*
+     * ВАЖНО! кажется будто бы доставать фильм и пользователя везде необязательно,
+     * НО это является дополнительной проверкой на валидность входных данных
+     */
 
+    public void AddReview(ReviewModifyDto reviewModifyDto, Guid movieId, string id)
+    {
+        var userEntity = _context
+            .Users
+            .FirstOrDefault(x => x.Id.ToString() == id);
+
+        /*
+         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
+         * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
-            throw new NotFoundException("User not found");
+            throw new PermissionDeniedException("User by with token not found");
         }
 
-        var movieEntity = _context.Movies
+        //TODO красиво собирать ошибки
+        var movieEntity = _context
+            .Movies
             .FirstOrDefault(x => x.Id == movieId);
 
         if (movieEntity == null)
         {
-            throw new NotFoundException("Movie not found");
+            throw new NotFoundException("Movie by this ID not found");
         }
 
-        var oldReview = _context.Reviews
-            .FirstOrDefault(x => x.User.Id == userEntity.Id 
+        var oldReview = _context
+            .Reviews
+            .FirstOrDefault(x => x.User.Id == userEntity.Id
                                  && x.Movie.Id == movieEntity.Id);
-        
+
         if (oldReview != null)
         {
-            throw new ReviewAlreadyExistsException("User has already had review for this movie");
+            throw new ReviewAlreadyExistsException("User already has review for this movie");
         }
 
         var reviewEntity = new ReviewEntity
@@ -56,20 +69,24 @@ public class ReviewService : IReviewService
         _context.SaveChanges();
     }
 
-    public void EditReview(ReviewModifyDto reviewModifyDto, Guid movieId, Guid reviewId, string userName)
+    public void EditReview(ReviewModifyDto reviewModifyDto, Guid movieId, Guid reviewId, string id)
     {
-        //вообще пользователя и фильм вытаскивать нет смысла, но нам могут подсунуть невалидные данные,
-        //а за это нужно ругать
+        var userEntity = _context
+            .Users
+            .FirstOrDefault(x => x.Id.ToString() == id);
 
-        var userEntity = _context.Users
-            .FirstOrDefault(x => x.UserName == userName);
-
+        /*
+         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
+         * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
-            throw new NotFoundException("User not found");
+            throw new PermissionDeniedException("User by with token not found");
         }
 
-        var movieEntity = _context.Movies
+        //TODO красиво собирать ошибки
+        var movieEntity = _context
+            .Movies
             .FirstOrDefault(x => x.Id == movieId);
 
         if (movieEntity == null)
@@ -77,14 +94,19 @@ public class ReviewService : IReviewService
             throw new NotFoundException("Movie not found");
         }
 
-        var reviewEntity = _context.Reviews
+        var reviewEntity = _context
+            .Reviews
             .FirstOrDefault(x => x.Id == reviewId
-                                 && x.User.Id == userEntity.Id
                                  && x.Movie.Id == movieEntity.Id);
 
         if (reviewEntity == null)
         {
             throw new NotFoundException("Review not found");
+        }
+
+        if (reviewEntity.User.Id.ToString() != userEntity.Id.ToString())
+        {
+            throw new NotEnoughtRightsException("you can not edit someone else's review");
         }
         
         reviewEntity.ReviewText = reviewModifyDto.reviewText;
@@ -94,17 +116,25 @@ public class ReviewService : IReviewService
         _context.SaveChanges();
     }
 
-    public void DeleteReview(Guid movieId, Guid reviewId, string userName)
+    public void DeleteReview(Guid movieId, Guid reviewId, string id)
     {
-        var userEntity = _context.Users
-            .FirstOrDefault(x => x.UserName == userName);
+        var userEntity = _context
+            .Users
+            .FirstOrDefault(x => x.Id.ToString() == id);
 
+        /*
+         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
+         * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
-            throw new NotFoundException("User not found");
+            throw new PermissionDeniedException("User by with token not found");
         }
 
-        var movieEntity = _context.Movies
+
+        //TODO красиво собирать ошибки
+        var movieEntity = _context
+            .Movies
             .FirstOrDefault(x => x.Id == movieId);
 
         if (movieEntity == null)
@@ -112,16 +142,22 @@ public class ReviewService : IReviewService
             throw new NotFoundException("Movie not found");
         }
 
-        var reviewEntity = _context.Reviews
-            .FirstOrDefault(x => x.Id == reviewId 
-                                 && x.User.Id == userEntity.Id
+        var reviewEntity = _context
+            .Reviews
+            .FirstOrDefault(x => x.Id == reviewId
                                  && x.Movie.Id == movieEntity.Id);
-
+        
         if (reviewEntity == null)
         {
             throw new NotFoundException("Review not found");
         }
-
+        
+        
+        if (reviewEntity.User.Id.ToString() != userEntity.Id.ToString())
+        {
+            throw new NotEnoughtRightsException("you can not delete someone else's review");
+        }
+        
         _context.Reviews.Remove(reviewEntity);
         _context.SaveChanges();
     }

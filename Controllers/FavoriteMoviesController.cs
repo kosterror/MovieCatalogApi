@@ -9,8 +9,8 @@ namespace MovieCatalogApi.Controllers;
 [Route("api/favorites")]
 public class FavoriteMoviesController : ControllerBase
 {
-    private IFavoriteMoviesService _favoriteMoviesService;
-    private IValidateTokenService _validateTokenService;
+    private readonly IFavoriteMoviesService _favoriteMoviesService;
+    private readonly IValidateTokenService _validateTokenService;
 
     public FavoriteMoviesController(IFavoriteMoviesService favoriteMoviesService, IValidateTokenService validateTokenService)
     {

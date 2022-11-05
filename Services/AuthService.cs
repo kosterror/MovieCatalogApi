@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
 using MovieCatalogApi.Controllers;
@@ -89,7 +90,8 @@ public class AuthService : IAuthService
 
     public LoggedOutDto LogoutUser(HttpContext httpContext)
     {
-        var token = _validateTokenService.GetToken(httpContext.Request.Headers);
+        // var token = _validateTokenService.GetToken(httpContext.Request.Headers);
+        var token = GetToken(httpContext.Request.Headers);
         
         var handler = new JwtSecurityTokenHandler();
         var expiredDate = handler.ReadJwtToken(token).ValidTo;
@@ -125,7 +127,7 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimsIdentity.DefaultNameClaimType, userEntity.UserName),
+            new Claim(ClaimsIdentity.DefaultNameClaimType, userEntity.Id.ToString()),
             new Claim(ClaimsIdentity.DefaultRoleClaimType, userEntity.IsAdmin ? "Admin" : "User")
         };
 
@@ -135,7 +137,31 @@ public class AuthService : IAuthService
         return claimsIdentity;
     }
 
-    private string NormalizeAyttribute(string attribute)
+    private string GetToken(IHeaderDictionary headerDictionary)
+    {
+        var requestHeaders = new Dictionary<string, string>();
+
+        foreach (var header in headerDictionary)
+        {
+            requestHeaders.Add(header.Key, header.Value);
+        }
+
+        var authorizationString = requestHeaders["Authorization"];
+
+
+        const string pattern = @"\S+\.\S+\.\S+";
+        var regex = new Regex(pattern);
+        var matches = regex.Matches(authorizationString);
+
+        if (matches.Count <= 0)
+        {
+            throw new CanNotGetTokenException("Can not get the token from headers");
+        }
+
+        return matches[0].Value;
+    }
+    
+    private static string NormalizeAyttribute(string attribute)
     {
         var result = attribute.ToLower();
         result = result.Replace(" ", "");

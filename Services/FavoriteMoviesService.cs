@@ -15,21 +15,29 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         _context = context;
     }
 
-    public MoviesListDto GetFavorites(string userName)
+    public MoviesListDto GetFavorites(string id)
     {
-        var userEntity = _context.Users
-            .FirstOrDefault(x => x.UserName == userName);
+        var userEntity = _context
+            .Users
+            .FirstOrDefault(x => x.Id.ToString() == id);
 
+
+        /*
+        * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
+        * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
             throw new PermissionDeniedException("User with this token was not found");
         }
 
-        var movies = _context.Movies
+        var movies = _context
+            .Movies
             .Include(x => x.Genres)
             .Include(x => x.LikedUsers)
-            .Where(x => x.LikedUsers.Contains(userEntity)).ToList();
-        
+            .Where(x => x.LikedUsers.Contains(userEntity))
+            .ToList();
+
         var moviesListDto = new MoviesListDto();
 
         foreach (var movie in movies)
@@ -40,14 +48,19 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         return moviesListDto;
     }
 
-    public void AddFavourite(string userName, Guid movieId)
+    public void AddFavourite(string id, Guid movieId)
     {
-        var userEntity = _context.Users
+        var userEntity = _context
+            .Users
             .Include(x => x.FavoriteMovies)
-            .FirstOrDefault(x => x.UserName == userName);
+            .FirstOrDefault(x => x.Id.ToString() == id);
 
         var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == movieId);
 
+        /*
+        * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
+        * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
             throw new PermissionDeniedException("User with this token was not found");
@@ -68,14 +81,19 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         _context.SaveChanges();
     }
 
-    public void DeleteFavourite(string userName, Guid movieId)
+    public void DeleteFavourite(string id, Guid movieId)
     {
-        var userEntity = _context.Users
+        var userEntity = _context
+            .Users
             .Include(x => x.FavoriteMovies)
-            .FirstOrDefault(x => x.UserName == userName);
+            .FirstOrDefault(x => x.Id.ToString() == id);
 
         var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == movieId);
-
+        
+        /*
+        * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
+        * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
             throw new PermissionDeniedException("User with this token was not found");
@@ -123,8 +141,8 @@ public class FavoriteMoviesService : IFavoriteMoviesService
 
         return result;
     }
-    
-    private List<GenreDto> GetGenres(MovieEntity movieEntity)
+
+    private static List<GenreDto> GetGenres(MovieEntity movieEntity)
     {
         var listGenreDtos = new List<GenreDto>();
 
@@ -138,7 +156,7 @@ public class FavoriteMoviesService : IFavoriteMoviesService
 
             listGenreDtos.Add(genreDto);
         }
-        
+
         return listGenreDtos;
     }
 
@@ -147,8 +165,8 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         var reviewShortDtos = new List<ReviewShortDto>();
 
         var reviews = _context.Reviews
-            .Include(x => x.User)   //будто бы лишняя строка           
-            .Include(x => x.Movie)  //и эта тоже
+            .Include(x => x.User) //будто бы лишняя строка           
+            .Include(x => x.Movie) //и эта тоже
             .Where(x => x.Movie.Id == movieEntity.Id).ToList();
 
         foreach (var review in reviews)
@@ -158,10 +176,10 @@ public class FavoriteMoviesService : IFavoriteMoviesService
                 id = review.Id,
                 rating = review.Rating
             };
-            
+
             reviewShortDtos.Add(shortReviewDto);
         }
-        
+
         return reviewShortDtos;
     }
 }

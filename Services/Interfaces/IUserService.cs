@@ -4,6 +4,6 @@ namespace MovieCatalogApi.Services;
 
 public interface IUserService
 {
-    ProfileDto GetProfile(string nickname);
-    void UpdateProfile(ProfileDto profileDto, string userName);
+    ProfileDto GetProfile(string id);
+    void UpdateProfile(ProfileDto newProfileDto, string id);
 }

@@ -14,26 +14,19 @@ public class UserService : IUserService
         _context = context;
     }
 
-    public ProfileDto GetProfile(string userName)
+    public ProfileDto GetProfile(string id)
     {
-        var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName);
-        
-        /*
-         * вероятность попасть сюда почти нулевая, ну мне так кажется 
-         * т.к. аннотация [Authorize] не пустит невалидный токен,
-         * а userName оттуда и достается
-        */
+        var userEntity = _context.Users.FirstOrDefault(x => x.Id.ToString() == id);
 
+        /*
+         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
+         * считаю, что это ошибка 401
+        */
         if (userEntity == null)
         {
-            /*
-             * если мы сюда попали, то будтобы беда с токеном, значит
-             * нужно заставить послать нам другой, валидный токен
-             * а для этого нужно заставить получить новый токен, поэтому ошибка с 401 кодом 
-             */
-            throw new PermissionDeniedException("User with this token not found");
+            throw new PermissionDeniedException("User by with token not found");
         }
-        
+
         var userProfile = new ProfileDto
         {
             id = userEntity.Id,
@@ -48,35 +41,45 @@ public class UserService : IUserService
         return userProfile;
     }
 
-    public void UpdateProfile(ProfileDto profileDto, string userName)
+    public void UpdateProfile(ProfileDto newProfileDto, string id)
     {
         /*
-         * Передаем логин, т.к. фронт может подсунуть нам не тот userId, так мы избегаем лишнюю валидацию
-         * вообще по-хорошему отдельную dto создать с полями, которые мы изменяем, а не со всем подряд
+         * Считаю, что использовать одну и ту же дто для получения информации о пользователи и её изменении - кринж
+         * ВАЖНО! поскольку мне не ответили в дискорде предоставлять ли возможность изменять ID пользователя,
+         * то этой возможности просто не будет. То есть данные в атрибуте ID будут просто игнорироваться
          */
 
-        var userEntityWithSameEmail = _context.Users.FirstOrDefault(x => x.Email == profileDto.email);
-        
-        if (userEntityWithSameEmail != null && userEntityWithSameEmail.UserName != userName)
+        var user = _context.Users.FirstOrDefault(x => x.Id.ToString() == id);
+
+        /*
+        * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
+        * считаю, что это ошибка 401
+        */
+        if (user == null)
         {
-            throw new UserAlreadyExistsException("User with such email has already exist");
+            throw new PermissionDeniedException("User by with token not found");
         }
 
-        var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName);
+        //TODO сделать красивый возврат ошибок
         
-        //вероятность попасть сюда почти нулевая, ну мне так кажется
-        //т.к. аннотация [Authorize] не должна пустить невалидный токен
-        if (userEntity == null)
+        var userEntityWithSameEmail = _context.Users.FirstOrDefault(x => x.Email == newProfileDto.email);
+        if (userEntityWithSameEmail != null && userEntityWithSameEmail.UserName != user.UserName)
         {
-            throw new PermissionDeniedException("User with this token not found");
+            throw new UserAlreadyExistsException("User with this email has already exists");
         }
 
-        //с остальными полями не работаю, т.к. они не могут на фронте изменяться
-        userEntity.Email = profileDto.email;
-        userEntity.Avatar = profileDto.avatarLink;
-        userEntity.Name = profileDto.name;
-        userEntity.BirthDate = profileDto.birthDate;
-        userEntity.Gender = profileDto.gender;
+        var userEntityWithSameUserName = _context.Users.FirstOrDefault(x => x.UserName == newProfileDto.nickName);
+        if (userEntityWithSameUserName != null && user.UserName != userEntityWithSameUserName.UserName)
+        {
+            throw new UserAlreadyExistsException("User with this UserName already exists");
+        }
+        
+        user.UserName = newProfileDto.nickName;
+        user.Email = newProfileDto.email;
+        user.Avatar = newProfileDto.avatarLink;
+        user.Name = newProfileDto.name;
+        user.BirthDate = newProfileDto.birthDate;
+        user.Gender = newProfileDto.gender;
         
         _context.SaveChanges();
     }

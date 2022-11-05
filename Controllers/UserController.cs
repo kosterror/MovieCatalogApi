@@ -9,8 +9,8 @@ namespace MovieCatalogApi.Controllers;
 [ApiController]
 public class UserController : Controller
 {
-    private IUserService _userService;
-    private IValidateTokenService _validateTokenService;
+    private readonly IUserService _userService;
+    private readonly IValidateTokenService _validateTokenService;
 
     public UserController(IUserService userService, IValidateTokenService validateTokenService)
     {
@@ -21,10 +21,9 @@ public class UserController : Controller
     [HttpGet]
     [Route("profile")]
     [Authorize]                     
-    [Authorize(Policy = "ValidateToken")]
     public ProfileDto GetProfile()
     {
-        // _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return _userService.GetProfile(User.Identity.Name);
     }
 
