@@ -4,5 +4,5 @@ public interface ILoggerService
 {
     Task LogInfo(string message);
 
-    Task LogException(string message);
+    Task LogError(string message);
 }

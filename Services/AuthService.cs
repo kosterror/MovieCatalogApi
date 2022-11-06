@@ -14,12 +14,10 @@ namespace MovieCatalogApi.Services;
 public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
-    private readonly IValidateTokenService _validateTokenService;
 
-    public AuthService(ApplicationDbContext context, IValidateTokenService validateTokenService)
+    public AuthService(ApplicationDbContext context)
     {
         _context = context;
-        _validateTokenService = validateTokenService;
     }
 
     public TokenDto RegisterUser(UserRegisterDto userRegisterDto)
@@ -90,7 +88,6 @@ public class AuthService : IAuthService
 
     public LoggedOutDto LogoutUser(HttpContext httpContext)
     {
-        // var token = _validateTokenService.GetToken(httpContext.Request.Headers);
         var token = GetToken(httpContext.Request.Headers);
         
         var handler = new JwtSecurityTokenHandler();
@@ -112,7 +109,6 @@ public class AuthService : IAuthService
             token = token,
             message = "Logged out"
         };
-
         return result;
     }
 

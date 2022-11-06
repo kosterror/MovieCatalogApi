@@ -24,61 +24,61 @@ public class ExceptionMiddlewareService
         }
         catch (NotFoundException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (WrongLoginCredentialsException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (ReviewAlreadyExistsException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (PermissionDeniedException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (BadRequestException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (UserAlreadyExistsException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status409Conflict;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (CanNotGetTokenException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (NotEnoughtRightsException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (NotAuthorizedException exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (Exception exception)
         {
-            await _loggerService.LogException(MakeLogMessage(context, exception));
+            await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsJsonAsync(new { message = "Something bad happens :(" });
         }

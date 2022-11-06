@@ -10,12 +10,10 @@ namespace MovieCatalogApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly IValidateTokenService _validateTokenService;
 
-    public AuthController(IAuthService authService, IValidateTokenService validateTokenService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _validateTokenService = validateTokenService;
     }
 
     [HttpPost]
@@ -31,7 +29,6 @@ public class AuthController : ControllerBase
     [Route("logout")]
     public LoggedOutDto Logout()
     {
-        // _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
         return _authService.LogoutUser(HttpContext);
     }
 

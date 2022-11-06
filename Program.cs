@@ -25,7 +25,6 @@ builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
-// builder.Services.AddSingleton<IAuthorizationHandler, CustomAuthRequirement>();
 builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization(options =>

@@ -11,7 +11,7 @@ public class LoggerService : ILoggerService
         await Log(path, $"{DateTime.UtcNow.ToLongTimeString()} |INF| {message}");          
     }
     
-    public async Task LogException(string message)
+    public async Task LogError(string message)
     {
         var path = GetPathFile();
         CreateLogFile(path);
