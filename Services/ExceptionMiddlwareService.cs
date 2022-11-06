@@ -70,6 +70,12 @@ public class ExceptionMiddlewareService
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
+        catch (NotAuthorizedException exception)
+        {
+            await _loggerService.LogException(MakeLogMessage(context, exception));
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsJsonAsync(new { message = exception.Message });
+        }
         catch (Exception exception)
         {
             await _loggerService.LogException(MakeLogMessage(context, exception));

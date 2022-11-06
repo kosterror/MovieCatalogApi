@@ -27,10 +27,11 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     [Route("logout")]
     public LoggedOutDto Logout()
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
+        // _validateTokenService.ValidateToken(HttpContext.Request.Headers);   
         return _authService.LogoutUser(HttpContext);
     }
 

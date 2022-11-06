@@ -26,13 +26,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHostedService<TokenCleanerService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
 // builder.Services.AddSingleton<IAuthorizationHandler, CustomAuthRequirement>();
-builder.Services.AddSingleton<IAuthorizationHandler, UserNameRequirementHandler>();
-
+builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHandler>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(
         "ValidateToken",
-        policy => policy.Requirements.Add(new UserNameRequirement("admin")));
+        policy => policy.Requirements.Add(new ValidateTokenRequirement()));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

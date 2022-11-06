@@ -165,8 +165,8 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         var reviewShortDtos = new List<ReviewShortDto>();
 
         var reviews = _context.Reviews
-            .Include(x => x.User) //будто бы лишняя строка           
-            .Include(x => x.Movie) //и эта тоже
+            .Include(x => x.User)                   //будто бы лишняя строка           
+            .Include(x => x.Movie)                  //и эта тоже
             .Where(x => x.Movie.Id == movieEntity.Id).ToList();
 
         foreach (var review in reviews)

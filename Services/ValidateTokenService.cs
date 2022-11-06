@@ -4,7 +4,6 @@ using MovieCatalogApi.Models;
 
 namespace MovieCatalogApi.Services;
 
-[Obsolete("Deprecated", false)]
 public class ValidateTokenService : IValidateTokenService
 {
     private readonly ApplicationDbContext _context;
