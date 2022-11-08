@@ -17,15 +17,15 @@ public class MovieController : ControllerBase
 
     [HttpGet]
     [Route("{page}")]
-    public MoviesPagedListDto GetPage(int page)
+    public async Task<MoviesPagedListDto> GetPage(int page)
     {
-        return _movieService.GetPage(page);
+        return await _movieService.GetPage(page);
     }
 
     [HttpGet]
     [Route("details/{id}")]
-    public MovieDetailsDto GetMovieDetails(Guid id)
+    public async Task<MovieDetailsDto> GetMovieDetails(Guid id)
     {
-        return _movieService.GetMovieDetails(id);
+        return await _movieService.GetMovieDetails(id);
     }
 }

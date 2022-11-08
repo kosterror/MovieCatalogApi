@@ -4,6 +4,6 @@ namespace MovieCatalogApi.Services;
 
 public interface IMovieService
 {
-    MoviesPagedListDto GetPage(int page);
-    MovieDetailsDto GetMovieDetails(Guid id);
+    Task<MoviesPagedListDto> GetPage(int page);
+    Task<MovieDetailsDto> GetMovieDetails(Guid id);
 }

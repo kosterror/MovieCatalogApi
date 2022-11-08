@@ -17,17 +17,26 @@ public class MovieService : IMovieService
         _configuration = configuration;
     }
 
-    public MoviesPagedListDto GetPage(int page)
+    public async Task<MoviesPagedListDto> GetPage(int page)
     {
-        var movieEntities = _context.Movies
+        if (page < 1)
+        {
+            throw new BadRequestException("Wrong page");
+        }
+        
+        var movieEntities = await _context
+            .Movies
             .Include(movie => movie.Genres)
             .Include(movie => movie.LikedUsers)
-            .ToList();
+            .ToListAsync();
         
+        var pageCount = (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize"));
+        pageCount = pageCount == 0 ? 1 : pageCount;
+
         var pageInfo = new PageInfoDto
         {
             currentPage = page,
-            pageCount = (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize")) == 0 ? 1 : (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize")),
+            pageCount = pageCount,
             pageSize = _configuration.GetValue<int>("PageSize")
         };
 
@@ -35,16 +44,16 @@ public class MovieService : IMovieService
         {
             throw new BadRequestException("Wrong page");
         }
-        
+
         var movieElementDtos = new List<MovieElementDto>();
 
         //получать с (page - 1) * pageSize по page * pageSize - 1
         for (var i = (page - 1) * pageInfo.pageSize; i < page * pageInfo.pageSize - 1 && i < movieEntities.Count; i++)
         {
-            movieElementDtos.Add(GetMovieElementDto(movieEntities[i]));
+            movieElementDtos.Add(await GetMovieElementDto(movieEntities[i]));
         }
 
-        
+
         var result = new MoviesPagedListDto
         {
             movies = movieElementDtos,
@@ -54,13 +63,15 @@ public class MovieService : IMovieService
         return result;
     }
 
-    public MovieDetailsDto GetMovieDetails(Guid id)
+    public async Task<MovieDetailsDto> GetMovieDetails(Guid id)
     {
-        var movieEntity = _context.Movies
+        var movieEntity = await _context
+            .Movies
             .Include(movie => movie.Genres)
             .Include(movie => movie.LikedUsers)
-            .FirstOrDefault(x => x.Id == id);
-        
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
+
         if (movieEntity == null)
         {
             throw new NotFoundException("Movie with this ID does not exists");
@@ -81,13 +92,13 @@ public class MovieService : IMovieService
             fees = movieEntity.Fees,
             ageLimit = movieEntity.AgeLimit,
             genres = GetGenreDtos(movieEntity),
-            reviews = GetReviewDtos(movieEntity)
+            reviews = await GetReviewDtos(movieEntity)
         };
 
         return movieDetailsDto;
     }
 
-    private MovieElementDto GetMovieElementDto(MovieEntity movieEntity)
+    private async Task<MovieElementDto> GetMovieElementDto(MovieEntity movieEntity)
     {
         var movieElementDto = new MovieElementDto
         {
@@ -97,13 +108,13 @@ public class MovieService : IMovieService
             year = movieEntity.Year,
             country = movieEntity.Country,
             genres = GetGenreDtos(movieEntity),
-            reviews = GetReviewShortDtos(movieEntity)
+            reviews = await GetReviewShortDtos(movieEntity)
         };
 
         return movieElementDto;
     }
 
-    private List<GenreDto> GetGenreDtos(MovieEntity movieEntity)
+    private static List<GenreDto> GetGenreDtos(MovieEntity movieEntity)
     {
         var genreEntities = movieEntity.Genres;
 
@@ -119,10 +130,15 @@ public class MovieService : IMovieService
         return genreDtos;
     }
 
-    private List<ReviewShortDto> GetReviewShortDtos(MovieEntity movieEntity)
+    private async Task<List<ReviewShortDto>> GetReviewShortDtos(MovieEntity movieEntity)
     {
-        var reviewEntities = _context.Reviews.Where(x => x.Movie.Id == movieEntity.Id).ToList();
+        var reviewEntities = await _context
+            .Reviews
+            .Where(x => x.Movie.Id == movieEntity.Id)
+            .ToListAsync();
 
+        
+            
         var reviewShortDtos =
             reviewEntities
                 .Select(reviewEntity => new ReviewShortDto
@@ -135,12 +151,13 @@ public class MovieService : IMovieService
         return reviewShortDtos;
     }
 
-    private List<ReviewDto> GetReviewDtos(MovieEntity movieEntity)
+    private async Task<List<ReviewDto>> GetReviewDtos(MovieEntity movieEntity)
     {
-        var reviewEntities = _context.Reviews
+        var reviewEntities = await _context
+            .Reviews
             .Where(x => x.Movie.Id == movieEntity.Id)
             .Include(x => x.User)
-            .ToList();
+            .ToListAsync();
 
         var reviewDtos =
             reviewEntities
@@ -158,7 +175,7 @@ public class MovieService : IMovieService
         return reviewDtos;
     }
 
-    private UserShortDto GetUserShortDto(ReviewEntity reviewEntity)
+    private static UserShortDto GetUserShortDto(ReviewEntity reviewEntity)
     {
         var userShortDto = new UserShortDto
         {
