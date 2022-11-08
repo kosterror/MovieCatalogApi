@@ -4,7 +4,7 @@ namespace MovieCatalogApi.Services;
 
 public interface IFavoriteMoviesService
 {
-    MoviesListDto GetFavorites(string id);
-    void AddFavourite(string id, Guid movieId);
-    void DeleteFavourite(string id, Guid movieId);
+    Task<MoviesListDto> GetFavorites(string id);
+    Task AddFavourite(string id, Guid movieId);
+    Task DeleteFavourite(string id, Guid movieId);
 }

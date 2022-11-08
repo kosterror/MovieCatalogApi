@@ -15,11 +15,12 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         _context = context;
     }
 
-    public MoviesListDto GetFavorites(string id)
+    public async Task<MoviesListDto> GetFavorites(string id)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
 
         /*
@@ -31,31 +32,35 @@ public class FavoriteMoviesService : IFavoriteMoviesService
             throw new PermissionDeniedException("User with this token was not found");
         }
 
-        var movies = _context
+        var movies = await _context
             .Movies
             .Include(x => x.Genres)
             .Include(x => x.LikedUsers)
             .Where(x => x.LikedUsers.Contains(userEntity))
-            .ToList();
+            .ToListAsync();
 
         var moviesListDto = new MoviesListDto();
 
         foreach (var movie in movies)
         {
-            moviesListDto.movies.Add(GetMovieElementDto(movie));
+            moviesListDto.movies.Add(await GetMovieElementDto(movie));
         }
 
         return moviesListDto;
     }
 
-    public void AddFavourite(string id, Guid movieId)
+    public async Task AddFavourite(string id, Guid movieId)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
             .Include(x => x.FavoriteMovies)
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
-        var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == movieId);
+        var movieEntity = await _context
+            .Movies
+            .Where(x => x.Id == movieId)
+            .FirstOrDefaultAsync();
 
         /*
         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
@@ -78,18 +83,22 @@ public class FavoriteMoviesService : IFavoriteMoviesService
 
         userEntity.FavoriteMovies.Add(movieEntity);
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void DeleteFavourite(string id, Guid movieId)
+    public async Task DeleteFavourite(string id, Guid movieId)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
             .Include(x => x.FavoriteMovies)
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
-        var movieEntity = _context.Movies.FirstOrDefault(x => x.Id == movieId);
-        
+        var movieEntity = await _context
+            .Movies
+            .Where(x => x.Id == movieId)
+            .FirstOrDefaultAsync();
+
         /*
         * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его Id из валидного токена
         * считаю, что это ошибка 401
@@ -109,24 +118,27 @@ public class FavoriteMoviesService : IFavoriteMoviesService
             throw new BadRequestException("Not-existing user favorite movie");
         }
 
-        var index = userEntity.FavoriteMovies.FindIndex(x => x.Id == movieId);
+        //TODO исправить удаление не по индексу, а сущности, НО АСИНХРОННО
+        var index = userEntity
+            .FavoriteMovies
+            .FindIndex(x => x.Id == movieId);
         userEntity.FavoriteMovies.RemoveAt(index);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    private MoviesListDto GetMovieLsitDto(List<MovieEntity> entities)
-    {
-        var result = new MoviesListDto();
+    // private async Task<MoviesListDto> GetMovieLsitDto(List<MovieEntity> entities)
+    // {
+    //     var result = new MoviesListDto();
+    //
+    //     foreach (var entity in entities)
+    //     {
+    //         result.movies.Add(await GetMovieElementDto(entity));
+    //     }
+    //
+    //     return result;
+    // }
 
-        foreach (var entity in entities)
-        {
-            result.movies.Add(GetMovieElementDto(entity));
-        }
-
-        return result;
-    }
-
-    private MovieElementDto GetMovieElementDto(MovieEntity movieEntity)
+    private async Task<MovieElementDto> GetMovieElementDto(MovieEntity movieEntity)
     {
         var result = new MovieElementDto
         {
@@ -136,7 +148,7 @@ public class FavoriteMoviesService : IFavoriteMoviesService
             year = movieEntity.Year,
             country = movieEntity.Country,
             genres = GetGenres(movieEntity),
-            reviews = GetShotReviews(movieEntity)
+            reviews = await GetShotReviews(movieEntity)
         };
 
         return result;
@@ -160,14 +172,15 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         return listGenreDtos;
     }
 
-    private List<ReviewShortDto> GetShotReviews(MovieEntity movieEntity)
+    private async Task<List<ReviewShortDto>> GetShotReviews(MovieEntity movieEntity)
     {
         var reviewShortDtos = new List<ReviewShortDto>();
 
-        var reviews = _context.Reviews
-            .Include(x => x.User)                   //будто бы лишняя строка           
-            .Include(x => x.Movie)                  //и эта тоже
-            .Where(x => x.Movie.Id == movieEntity.Id).ToList();
+        var reviews = await _context.Reviews
+            .Include(x => x.User) //будто бы лишняя строка           
+            .Include(x => x.Movie) //и эта тоже
+            .Where(x => x.Movie.Id == movieEntity.Id)
+            .ToListAsync();
 
         foreach (var review in reviews)
         {

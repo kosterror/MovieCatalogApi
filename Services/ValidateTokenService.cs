@@ -14,12 +14,12 @@ public class ValidateTokenService : IValidateTokenService
         _context = context;
     }
 
-    public void ValidateToken(IHeaderDictionary headerDictionary)
+    public async Task ValidateToken(IHeaderDictionary headerDictionary)
     {
         //достать токен
         var token = GetToken(headerDictionary);
 
-        var tokenEntities = _context
+        var tokenEntities = await _context
             .Tokens
             .Where(x => x.Token == token)
             .FirstOrDefaultAsync();
@@ -34,7 +34,7 @@ public class ValidateTokenService : IValidateTokenService
     /**
      * достаем токен из хэдера запроса
      */
-    public string GetToken(IHeaderDictionary headerDictionary)
+    private string GetToken(IHeaderDictionary headerDictionary)
     {
         var requestHeaders = new Dictionary<string, string>();
 

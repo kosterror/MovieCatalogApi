@@ -2,6 +2,5 @@
 
 public interface IValidateTokenService
 {
-    void ValidateToken(IHeaderDictionary headerDictionary);
-    string GetToken(IHeaderDictionary headerDictionary);
+    Task ValidateToken(IHeaderDictionary headerDictionary);
 }
