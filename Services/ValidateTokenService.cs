@@ -26,7 +26,7 @@ public class ValidateTokenService : IValidateTokenService
 
         if (tokenEntities != null)
         {
-            throw new PermissionDeniedException("Token expired");
+            throw new UserNotFoundException("Token expired");
         }
         
     }

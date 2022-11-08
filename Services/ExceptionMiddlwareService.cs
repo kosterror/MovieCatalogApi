@@ -40,7 +40,7 @@ public class ExceptionMiddlewareService
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
-        catch (PermissionDeniedException exception)
+        catch (UserNotFoundException exception)
         {
             await _loggerService.LogError(MakeLogMessage(context, exception));
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;

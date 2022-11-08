@@ -21,18 +21,18 @@ public class UserController : Controller
     [HttpGet]
     [Route("profile")]
     [Authorize]                     
-    public ProfileDto GetProfile()
+    public async Task<ProfileDto> GetProfile()
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-        return _userService.GetProfile(User.Identity.Name);
+        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        return await _userService.GetProfile(User.Identity.Name);
     }
 
     [HttpPut]
     [Route("profile")]
     [Authorize]
-    public void UpdateProfile([FromBody] ProfileDto profileDto)
+    public async Task UpdateProfile([FromBody] ProfileDto profileDto)
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-        _userService.UpdateProfile(profileDto, User.Identity.Name);
+        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        await _userService.UpdateProfile(profileDto, User.Identity.Name);
     }
 }

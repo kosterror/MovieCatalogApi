@@ -33,7 +33,7 @@ public class ReviewService : IReviewService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User by with token not found");
+            throw new UserNotFoundException("User by with token not found");
         }
         
         var movieEntity = await _context
@@ -86,7 +86,7 @@ public class ReviewService : IReviewService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User by with token not found");
+            throw new UserNotFoundException("User by with token not found");
         }
 
         var movieEntity = await _context
@@ -135,7 +135,7 @@ public class ReviewService : IReviewService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User by with token not found");
+            throw new UserNotFoundException("User by with token not found");
         }
         
         

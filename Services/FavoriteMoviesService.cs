@@ -29,7 +29,7 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User with this token was not found");
+            throw new UserNotFoundException("User with this token was not found");
         }
 
         var movies = await _context
@@ -68,7 +68,7 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User with this token was not found");
+            throw new UserNotFoundException("User with this token was not found");
         }
 
         if (movieEntity == null)
@@ -105,7 +105,7 @@ public class FavoriteMoviesService : IFavoriteMoviesService
         */
         if (userEntity == null)
         {
-            throw new PermissionDeniedException("User with this token was not found");
+            throw new UserNotFoundException("User with this token was not found");
         }
 
         if (movieEntity == null)
