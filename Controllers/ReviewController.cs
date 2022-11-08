@@ -21,27 +21,27 @@ public class ReviewController : ControllerBase
     [HttpPost]
     [Route("{movieId}/review/add")]
     [Authorize]
-    public void AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
+    public async Task AddReview(Guid movieId, [FromBody] ReviewModifyDto reviewModifyDto)
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-        _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
+        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        await _reviewService.AddReview(reviewModifyDto, movieId, User.Identity.Name);
     }
 
     [HttpPut]
     [Route("{movieId}/review/{id}/edit")]
     [Authorize]
-    public void EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
+    public async Task EditReview([FromBody] ReviewModifyDto reviewModifyDto, Guid movieId, Guid id)
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-        _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
+        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        await _reviewService.EditReview(reviewModifyDto, movieId, id, User.Identity.Name);
     }
 
     [HttpDelete]
     [Route("{movieId}/review/{id}/delete")]
     [Authorize]
-    public void DeleteReview(Guid movieId, Guid id)
+    public async Task DeleteReview(Guid movieId, Guid id)
     {
-        _validateTokenService.ValidateToken(HttpContext.Request.Headers);
-        _reviewService.DeleteReview(movieId, id, User.Identity.Name);
+        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        await _reviewService.DeleteReview(movieId, id, User.Identity.Name);
     }
 }

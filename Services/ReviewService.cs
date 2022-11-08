@@ -1,4 +1,5 @@
-﻿using MovieCatalogApi.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Models.Entities;
@@ -19,11 +20,12 @@ public class ReviewService : IReviewService
      * НО это является дополнительной проверкой на валидность входных данных
      */
 
-    public void AddReview(ReviewModifyDto reviewModifyDto, Guid movieId, string id)
+    public async Task AddReview(ReviewModifyDto reviewModifyDto, Guid movieId, string id)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
         /*
          * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
@@ -33,21 +35,23 @@ public class ReviewService : IReviewService
         {
             throw new PermissionDeniedException("User by with token not found");
         }
-
-        //TODO красиво собирать ошибки
-        var movieEntity = _context
+        
+        var movieEntity = await _context
             .Movies
-            .FirstOrDefault(x => x.Id == movieId);
+            .Where(x => x.Id == movieId)
+            .FirstOrDefaultAsync();
 
         if (movieEntity == null)
         {
             throw new NotFoundException("Movie by this ID not found");
         }
 
-        var oldReview = _context
+        var oldReview = await _context
             .Reviews
-            .FirstOrDefault(x => x.User.Id == userEntity.Id
-                                 && x.Movie.Id == movieEntity.Id);
+            .Where(x => x.User.Id == userEntity.Id
+                        && x.Movie.Id == movieEntity.Id)
+            .FirstOrDefaultAsync();
+
 
         if (oldReview != null)
         {
@@ -65,15 +69,16 @@ public class ReviewService : IReviewService
             CreatedDateTime = DateTime.Now.ToUniversalTime()
         };
 
-        _context.Reviews.Add(reviewEntity);
-        _context.SaveChanges();
+        await _context.Reviews.AddAsync(reviewEntity);
+        await _context.SaveChangesAsync();
     }
 
-    public void EditReview(ReviewModifyDto reviewModifyDto, Guid movieId, Guid reviewId, string id)
+    public async Task EditReview(ReviewModifyDto reviewModifyDto, Guid movieId, Guid reviewId, string id)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
         /*
          * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
@@ -84,20 +89,21 @@ public class ReviewService : IReviewService
             throw new PermissionDeniedException("User by with token not found");
         }
 
-        //TODO красиво собирать ошибки
-        var movieEntity = _context
+        var movieEntity = await _context
             .Movies
-            .FirstOrDefault(x => x.Id == movieId);
+            .Where(x => x.Id == movieId)
+            .FirstOrDefaultAsync();
 
         if (movieEntity == null)
         {
             throw new NotFoundException("Movie not found");
         }
 
-        var reviewEntity = _context
+        var reviewEntity = await _context
             .Reviews
-            .FirstOrDefault(x => x.Id == reviewId
-                                 && x.Movie.Id == movieEntity.Id);
+            .Where(x => x.Id == reviewId
+                        && x.Movie.Id == movieEntity.Id)
+            .FirstOrDefaultAsync();
 
         if (reviewEntity == null)
         {
@@ -106,21 +112,22 @@ public class ReviewService : IReviewService
 
         if (reviewEntity.User.Id.ToString() != userEntity.Id.ToString())
         {
-            throw new NotEnoughtRightsException("you can not edit someone else's review");
+            throw new NotEnoughtRightsException("You can not edit someone else's review");
         }
-        
+
         reviewEntity.ReviewText = reviewModifyDto.reviewText;
         reviewEntity.Rating = reviewModifyDto.rating;
         reviewEntity.IsAnonymous = reviewModifyDto.isAnonymous;
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void DeleteReview(Guid movieId, Guid reviewId, string id)
+    public async Task DeleteReview(Guid movieId, Guid reviewId, string id)
     {
-        var userEntity = _context
+        var userEntity = await _context
             .Users
-            .FirstOrDefault(x => x.Id.ToString() == id);
+            .Where(x => x.Id.ToString() == id)
+            .FirstOrDefaultAsync();
 
         /*
          * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена
@@ -130,35 +137,37 @@ public class ReviewService : IReviewService
         {
             throw new PermissionDeniedException("User by with token not found");
         }
-
-
-        //TODO красиво собирать ошибки
-        var movieEntity = _context
+        
+        
+        var movieEntity = await _context
             .Movies
-            .FirstOrDefault(x => x.Id == movieId);
+            .Where(x => x.Id == movieId)
+            .FirstOrDefaultAsync();
 
         if (movieEntity == null)
         {
             throw new NotFoundException("Movie not found");
         }
 
-        var reviewEntity = _context
+        var reviewEntity = await _context
             .Reviews
-            .FirstOrDefault(x => x.Id == reviewId
-                                 && x.Movie.Id == movieEntity.Id);
-        
+            .Include(review => review.User)
+            .Where(x => x.Id == reviewId
+                        && x.Movie.Id == movieEntity.Id)
+            .FirstOrDefaultAsync();
+
         if (reviewEntity == null)
         {
             throw new NotFoundException("Review not found");
         }
-        
-        
-        if (reviewEntity.User.Id.ToString() != userEntity.Id.ToString())
+
+
+        if (reviewEntity.User.Id != userEntity.Id)
         {
-            throw new NotEnoughtRightsException("you can not delete someone else's review");
+            throw new NotEnoughtRightsException("You can not delete someone else's review");
         }
-        
+
         _context.Reviews.Remove(reviewEntity);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }
