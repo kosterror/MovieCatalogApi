@@ -27,7 +27,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -43,9 +42,9 @@ builder.Services.AddSingleton<IAuthorizationHandler, ValidateTokenRequirementHan
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(
-        "ValidateToken",
-        policy => policy.Requirements.Add(new ValidateTokenRequirement()));
+      options.AddPolicy(
+          "ValidateToken",
+          policy => policy.Requirements.Add(new ValidateTokenRequirement()));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -65,7 +64,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //DB connection
 var connectionPsql = builder.Configuration.GetConnectionString("Postgres");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionPsql), ServiceLifetime.Singleton);
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionPsql));
 
 var app = builder.Build();
 

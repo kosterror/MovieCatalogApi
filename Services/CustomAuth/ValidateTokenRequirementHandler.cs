@@ -8,13 +8,14 @@ namespace MovieCatalogApi.Services.CustomAuth;
 
 public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateTokenRequirement>
 {
-    private readonly ApplicationDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public ValidateTokenRequirementHandler(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+    public ValidateTokenRequirementHandler(IHttpContextAccessor httpContextAccessor,
+        IServiceScopeFactory serviceScopeFactory)
     {
-        _context = context;
         _httpContextAccessor = httpContextAccessor;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -22,15 +23,21 @@ public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateToke
     {
         var authorizationString = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
         var token = GetToken(authorizationString);
-        
-        var tokenEntity = await _context.Tokens.Where(x => x.Token == token).FirstOrDefaultAsync();
 
-        if (tokenEntity != null)
+        using (var scope = _serviceScopeFactory.CreateScope())
         {
-            throw new NotAuthorizedException("Not authorized");
-        }
+            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        context.Succeed(requirement);
+
+            var tokenEntity = await _context.Tokens.Where(x => x.Token == token).FirstOrDefaultAsync();
+
+            if (tokenEntity != null)
+            {
+                throw new NotAuthorizedException("Not authorized");
+            }
+
+            context.Succeed(requirement);
+        }
     }
 
     private static string GetToken(string authorizationString)
@@ -45,7 +52,7 @@ public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateToke
         }
 
         var token = matches[0].Value;
-        
+
         if (token == null)
         {
             throw new NotAuthorizedException("Not authorized");
