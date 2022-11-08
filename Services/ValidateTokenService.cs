@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 
@@ -18,7 +19,10 @@ public class ValidateTokenService : IValidateTokenService
         //достать токен
         var token = GetToken(headerDictionary);
 
-        var tokenEntities = _context.Tokens.FirstOrDefault(x => x.Token == token);
+        var tokenEntities = _context
+            .Tokens
+            .Where(x => x.Token == token)
+            .FirstOrDefaultAsync();
 
         if (tokenEntities != null)
         {

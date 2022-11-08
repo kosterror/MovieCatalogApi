@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MovieCatalogApi.Conmfigurations;
 using MovieCatalogApi.Controllers;
@@ -20,12 +21,12 @@ public class AuthService : IAuthService
         _context = context;
     }
 
-    public TokenDto RegisterUser(UserRegisterDto userRegisterDto)
+    public async Task<TokenDto> RegisterUser(UserRegisterDto userRegisterDto)
     {
         userRegisterDto.email = NormalizeAyttribute(userRegisterDto.email);
         userRegisterDto.userName = NormalizeAyttribute(userRegisterDto.userName);
 
-        CheckUniqueFields(userRegisterDto);
+        await CheckUniqueFields(userRegisterDto);
 
         var userEntity = new UserEntity
         {
@@ -36,23 +37,23 @@ public class AuthService : IAuthService
             Email = userRegisterDto.email,
             BirthDate = userRegisterDto.birthDate,
             Gender = userRegisterDto.gender,
-            IsAdmin = false,                        //в спеке не нашел, где этот атрибут играл бы важную роль
+            IsAdmin = false, //в спеке не нашел, где этот атрибут играл бы важную роль
             Avatar = "none"
         };
 
-        _context.Users.Add(userEntity);
-        _context.SaveChanges();
-        
+        await _context.Users.AddAsync(userEntity);
+        await _context.SaveChangesAsync();
+
         var loginCredentials = new LoginCredentials
         {
             password = userEntity.Password,
             username = userEntity.UserName
         };
 
-        return LoginUser(loginCredentials);
+        return await LoginUser(loginCredentials);
     }
 
-    public TokenDto LoginUser(LoginCredentials loginCredentials)
+    public async Task<TokenDto> LoginUser(LoginCredentials loginCredentials)
     {
         /*
          * логин должен быть в нижнем регистре и без пробелов
@@ -61,7 +62,7 @@ public class AuthService : IAuthService
 
         loginCredentials.username = NormalizeAyttribute(loginCredentials.username);
 
-        var identity = GetIdentity(loginCredentials.username, loginCredentials.password);
+        var identity = await GetIdentity(loginCredentials.username, loginCredentials.password);
 
         var now = DateTime.UtcNow;
 
@@ -76,7 +77,7 @@ public class AuthService : IAuthService
 
 
         var encodeJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-        
+
 
         var result = new TokenDto()
         {
@@ -86,24 +87,24 @@ public class AuthService : IAuthService
         return result;
     }
 
-    public LoggedOutDto LogoutUser(HttpContext httpContext)
+    public async Task<LoggedOutDto> LogoutUser(HttpContext httpContext)
     {
         var token = GetToken(httpContext.Request.Headers);
-        
+
         var handler = new JwtSecurityTokenHandler();
         var expiredDate = handler.ReadJwtToken(token).ValidTo;
-        
+
         var tokenEntity = new TokenEntity
         {
             Id = Guid.NewGuid(),
             Token = token,
             ExpiredDate = expiredDate
         };
-        
-        _context.Tokens.Add(tokenEntity);
-        _context.SaveChanges();
-        
-        
+
+        await _context.Tokens.AddAsync(tokenEntity);
+        await _context.SaveChangesAsync();
+
+
         var result = new LoggedOutDto()
         {
             token = token,
@@ -112,9 +113,12 @@ public class AuthService : IAuthService
         return result;
     }
 
-    private ClaimsIdentity GetIdentity(string userName, string password)
+    private async Task<ClaimsIdentity> GetIdentity(string userName, string password)
     {
-        var userEntity = _context.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
+        var userEntity = await _context
+            .Users
+            .Where(x => x.UserName == userName && x.Password == password)
+            .FirstOrDefaultAsync();
 
         if (userEntity == null)
         {
@@ -127,13 +131,18 @@ public class AuthService : IAuthService
             new Claim(ClaimsIdentity.DefaultRoleClaimType, userEntity.IsAdmin ? "Admin" : "User")
         };
 
-        var claimsIdentity = new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,
-            ClaimsIdentity.DefaultRoleClaimType);
+        var claimsIdentity = new ClaimsIdentity
+        (
+            claims,
+            "Token",
+            ClaimsIdentity.DefaultNameClaimType,
+            ClaimsIdentity.DefaultRoleClaimType
+        );
 
         return claimsIdentity;
     }
 
-    private string GetToken(IHeaderDictionary headerDictionary)
+    private static string GetToken(IHeaderDictionary headerDictionary)
     {
         var requestHeaders = new Dictionary<string, string>();
 
@@ -156,7 +165,7 @@ public class AuthService : IAuthService
 
         return matches[0].Value;
     }
-    
+
     private static string NormalizeAyttribute(string attribute)
     {
         var result = attribute.ToLower();
@@ -165,17 +174,23 @@ public class AuthService : IAuthService
         return result;
     }
 
-    private void CheckUniqueFields(UserRegisterDto userRegisterDto)
+    private async Task CheckUniqueFields(UserRegisterDto userRegisterDto)
     {
-        var checkUniqueUserName = _context.Users.FirstOrDefault(x => userRegisterDto.userName == x.UserName);
+        var checkUniqueUserName = await _context
+            .Users
+            .Where(x => userRegisterDto.userName == x.UserName)
+            .FirstOrDefaultAsync();
 
         if (checkUniqueUserName != null)
         {
             throw new UserAlreadyExistsException($"UserName '{userRegisterDto.userName}' is already taken");
         }
-        
-        
-        var checkUniqueEmail = _context.Users.FirstOrDefault(x => userRegisterDto.email == x.Email);
+
+
+        var checkUniqueEmail = await _context
+            .Users
+            .Where(x => userRegisterDto.email == x.Email)
+            .FirstOrDefaultAsync();
 
         if (checkUniqueEmail != null)
         {

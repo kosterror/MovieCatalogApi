@@ -18,24 +18,24 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    public TokenDto RegisterUser([FromBody] UserRegisterDto userRegisterDto)
+    public async Task<TokenDto> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
     {
-        return _authService.RegisterUser(userRegisterDto);
+        return await _authService.RegisterUser(userRegisterDto);
     }
 
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
     [Route("logout")]
-    public LoggedOutDto Logout()
+    public async Task<LoggedOutDto> Logout()
     {
-        return _authService.LogoutUser(HttpContext);
+        return await _authService.LogoutUser(HttpContext);
     }
 
     [HttpPost]
     [Route("login")]
     public async Task<TokenDto> Login([FromBody] LoginCredentials loginCredentials)
     {
-        return _authService.LoginUser(loginCredentials);
+        return await _authService.LoginUser(loginCredentials);
     }
 }
