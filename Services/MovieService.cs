@@ -23,13 +23,13 @@ public class MovieService : IMovieService
         {
             throw new BadRequestException("Wrong page");
         }
-        
+
         var movieEntities = await _context
             .Movies
             .Include(movie => movie.Genres)
             .Include(movie => movie.LikedUsers)
             .ToListAsync();
-        
+
         var pageCount = (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize"));
         pageCount = pageCount == 0 ? 1 : pageCount;
 
@@ -137,16 +137,14 @@ public class MovieService : IMovieService
             .Where(x => x.Movie.Id == movieEntity.Id)
             .ToListAsync();
 
-        
-            
-        var reviewShortDtos =
-            reviewEntities
-                .Select(reviewEntity => new ReviewShortDto
-                {
-                    id = reviewEntity.Id,
-                    rating = reviewEntity.Rating
-                })
-                .ToList();
+
+        var reviewShortDtos = reviewEntities
+            .Select(reviewEntity => new ReviewShortDto
+            {
+                id = reviewEntity.Id,
+                rating = reviewEntity.Rating
+            })
+            .ToList();
 
         return reviewShortDtos;
     }

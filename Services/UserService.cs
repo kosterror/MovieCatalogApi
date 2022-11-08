@@ -19,8 +19,7 @@ public class UserService : IUserService
     {
         var userEntity = await _context
             .Users
-            .Where(x => x.Id.ToString() == id)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(x => x.Id.ToString() == id);
 
         /*
          * вероятность сюда попасть - почти нулевая, т.к. мы не нашли пользователя по его ID из валидного токена

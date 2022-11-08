@@ -23,7 +23,7 @@ public class UserController : Controller
     [Authorize]                     
     public async Task<ProfileDto> GetProfile()
     {
-        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
+        // await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return await _userService.GetProfile(User.Identity.Name);
     }
 
