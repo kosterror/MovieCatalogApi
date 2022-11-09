@@ -31,7 +31,7 @@ public class ExceptionMiddlewareService
         catch (WrongLoginCredentialsException exception)
         {
             await _loggerService.LogError(MakeLogMessage(context, exception));
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new { message = exception.Message });
         }
         catch (ReviewAlreadyExistsException exception)

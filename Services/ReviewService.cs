@@ -101,6 +101,7 @@ public class ReviewService : IReviewService
 
         var reviewEntity = await _context
             .Reviews
+            .Include(review => review.User)
             .Where(x => x.Id == reviewId
                         && x.Movie.Id == movieEntity.Id)
             .FirstOrDefaultAsync();

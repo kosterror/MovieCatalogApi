@@ -169,7 +169,7 @@ public class AuthService : IAuthService
     private static string NormalizeAyttribute(string attribute)
     {
         var result = attribute.ToLower();
-        result = result.Replace(" ", "");
+        result = result.TrimEnd();
 
         return result;
     }
