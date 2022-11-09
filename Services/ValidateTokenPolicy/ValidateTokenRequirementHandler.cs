@@ -11,7 +11,7 @@ public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateToke
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-
+    
     public ValidateTokenRequirementHandler(IHttpContextAccessor httpContextAccessor,
         IServiceScopeFactory serviceScopeFactory)
     {
@@ -27,27 +27,27 @@ public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateToke
             var authorizationString = _httpContextAccessor.HttpContext.Request.Headers[HeaderNames.Authorization];
             var token = GetToken(authorizationString);
 
-            using (var scope = _serviceScopeFactory.CreateScope())
+            using var scope = _serviceScopeFactory.CreateScope();
+            var appDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+
+            var tokenEntity = await appDbContext
+                .Tokens
+                .Where(x => x.Token == token)
+                .FirstOrDefaultAsync();
+            
+                
+            if (tokenEntity != null)
             {
-                var _appDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-
-                var tokenEntity = await _appDbContext
-                    .Tokens
-                    .Where(x => x.Token == token)
-                    .FirstOrDefaultAsync();
-
-                if (tokenEntity != null)
-                {
-                    throw new NotAuthorizedException("Not authorized");
-                }
-
-                context.Succeed(requirement);
+                throw new NotAuthorizedException("Not authorized");
             }
+
+            context.Succeed(requirement);
         }
         else
         {
-            throw new NotAuthorizedException("Not authorized");
+            //вообще вряд ли, что сюда когда-нибудь попадём
+            throw new BadRequestException("Bad request");
         }
     }
 

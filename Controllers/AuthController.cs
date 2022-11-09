@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MovieCatalogApi.Models.Dtos;
 using MovieCatalogApi.Services;
@@ -26,6 +27,7 @@ public class AuthController : ControllerBase
     [HttpPost]
     [Authorize]
     [Authorize(Policy = "ValidateToken")]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "ValidateToken")]
     [Route("logout")]
     public async Task<LoggedOutDto> Logout()
     {

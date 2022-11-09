@@ -24,35 +24,41 @@ public class MovieService : IMovieService
             throw new BadRequestException("Wrong page");
         }
 
+        var maxMovieCount = _configuration.GetValue<double>("PageSize");
+        var filmCountInDb = _context.Movies.Count();
+        var skeepCount = (int)((page - 1) * maxMovieCount);
+        var takeCount = (int)Math.Min(filmCountInDb - (page - 1) * maxMovieCount, maxMovieCount);
+        var pageCount = (int)Math.Ceiling(filmCountInDb / maxMovieCount);
+        pageCount = pageCount == 0 ? 1 : pageCount;
+
+        if (page > pageCount)
+        {
+            throw new BadRequestException("Wrong page");
+        }
+        
         var movieEntities = await _context
             .Movies
             .Include(movie => movie.Genres)
             .Include(movie => movie.LikedUsers)
+            .OrderByDescending(movie => movie.Id)
+            .Skip(skeepCount)
+            .Take(takeCount)
             .ToListAsync();
-
-        var pageCount = (int)Math.Ceiling(movieEntities.Count / _configuration.GetValue<double>("PageSize"));
-        pageCount = pageCount == 0 ? 1 : pageCount;
-
+        
+        
         var pageInfo = new PageInfoDto
         {
             currentPage = page,
             pageCount = pageCount,
-            pageSize = _configuration.GetValue<int>("PageSize")
+            pageSize = movieEntities.Count
         };
-
-        if (page > pageInfo.pageCount)
-        {
-            throw new BadRequestException("Wrong page");
-        }
 
         var movieElementDtos = new List<MovieElementDto>();
 
-        //получать с (page - 1) * pageSize по page * pageSize - 1
-        for (var i = (page - 1) * pageInfo.pageSize; i < page * pageInfo.pageSize - 1 && i < movieEntities.Count; i++)
+        foreach (var movoeEntity in movieEntities)
         {
-            movieElementDtos.Add(await GetMovieElementDto(movieEntities[i]));
+            movieElementDtos.Add(await GetMovieElementDto(movoeEntity));
         }
-
 
         var result = new MoviesPagedListDto
         {

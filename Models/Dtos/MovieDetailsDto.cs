@@ -10,8 +10,8 @@ public class MovieDetailsDto
     public List<GenreDto> genres { get; set; } = new();
     public List<ReviewDto> reviews { get; set; } = new();
     public int time { get; set; }
-    public string tagline { get; set; }
-    public string description { get; set; }
+    public string? tagline { get; set; }
+    public string? description { get; set; }
     public string director { get; set; }
     public int? budget { get; set; }
     public int? fees { get; set; }
