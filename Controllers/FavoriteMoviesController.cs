@@ -10,37 +10,35 @@ namespace MovieCatalogApi.Controllers;
 public class FavoriteMoviesController : ControllerBase
 {
     private readonly IFavoriteMoviesService _favoriteMoviesService;
-    private readonly IValidateTokenService _validateTokenService;
 
-    public FavoriteMoviesController(IFavoriteMoviesService favoriteMoviesService, IValidateTokenService validateTokenService)
+    public FavoriteMoviesController(IFavoriteMoviesService favoriteMoviesService)
     {
         _favoriteMoviesService = favoriteMoviesService;
-        _validateTokenService = validateTokenService;
     }
     
     [HttpGet]
     [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     public async Task<MoviesListDto> GetFavoriteMovies()
     {
-        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return await _favoriteMoviesService.GetFavorites(User.Identity.Name);
     }
 
     [HttpPost]
     [Route("{id}/add")]
     [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     public async Task AddFavourite(Guid id)
     {
-        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         await _favoriteMoviesService.AddFavourite(User.Identity.Name, id);
     }
 
     [HttpDelete]
     [Route("{id}/delete")]
     [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     public async Task DeleteFavouriute(Guid id)
     {
-        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         await _favoriteMoviesService.DeleteFavourite(User.Identity.Name, id);
     }
 }

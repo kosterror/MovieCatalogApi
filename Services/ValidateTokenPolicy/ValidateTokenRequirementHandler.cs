@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using MovieCatalogApi.Exceptions;
 using MovieCatalogApi.Models;
 
@@ -21,22 +22,32 @@ public class ValidateTokenRequirementHandler : AuthorizationHandler<ValidateToke
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
         ValidateTokenRequirement requirement)
     {
-        var authorizationString = _httpContextAccessor.HttpContext.Request.Headers["Authorization"];
-        var token = GetToken(authorizationString);
-
-        using (var scope = _serviceScopeFactory.CreateScope())
+        if (_httpContextAccessor.HttpContext != null)
         {
-            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var authorizationString = _httpContextAccessor.HttpContext.Request.Headers[HeaderNames.Authorization];
+            var token = GetToken(authorizationString);
 
-
-            var tokenEntity = await _context.Tokens.Where(x => x.Token == token).FirstOrDefaultAsync();
-
-            if (tokenEntity != null)
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                throw new NotAuthorizedException("Not authorized");
-            }
+                var _appDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            context.Succeed(requirement);
+
+                var tokenEntity = await _appDbContext
+                    .Tokens
+                    .Where(x => x.Token == token)
+                    .FirstOrDefaultAsync();
+
+                if (tokenEntity != null)
+                {
+                    throw new NotAuthorizedException("Not authorized");
+                }
+
+                context.Succeed(requirement);
+            }
+        }
+        else
+        {
+            throw new NotAuthorizedException("Not authorized");
         }
     }
 

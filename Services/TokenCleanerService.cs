@@ -16,7 +16,6 @@ public class TokenCleanerService : BackgroundService
         //нет смысла держать configuration свойством класса, т.к. мы к обращаемся к нему единожды
         _loggerService = loggerService;
         _delay = TimeSpan.FromMinutes(configuration.GetValue<int>("TokenCleanerDelayInMinutes"));
-        _delay = TimeSpan.FromSeconds(5);
         _serviceScopeFactory = serviceScopeFactory;
     }
 

@@ -8,7 +8,7 @@ using MovieCatalogApi.Models;
 using MovieCatalogApi.Services;
 using MovieCatalogApi.Services.CustomAuth;
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +29,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IValidateTokenService, ValidateTokenService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IFavoriteMoviesService, FavoriteMoviesService>();

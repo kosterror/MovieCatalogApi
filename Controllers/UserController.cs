@@ -10,29 +10,27 @@ namespace MovieCatalogApi.Controllers;
 public class UserController : Controller
 {
     private readonly IUserService _userService;
-    private readonly IValidateTokenService _validateTokenService;
 
-    public UserController(IUserService userService, IValidateTokenService validateTokenService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
-        _validateTokenService = validateTokenService;
     }
 
     [HttpGet]
     [Route("profile")]
     [Authorize]                     
+    [Authorize(Policy = "ValidateToken")]
     public async Task<ProfileDto> GetProfile()
     {
-        // await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         return await _userService.GetProfile(User.Identity.Name);
     }
 
     [HttpPut]
     [Route("profile")]
     [Authorize]
+    [Authorize(Policy = "ValidateToken")]
     public async Task UpdateProfile([FromBody] ProfileDto profileDto)
     {
-        await _validateTokenService.ValidateToken(HttpContext.Request.Headers);
         await _userService.UpdateProfile(profileDto, User.Identity.Name);
     }
 }
